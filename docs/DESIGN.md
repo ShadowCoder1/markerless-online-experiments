@@ -58,7 +58,7 @@ data collection: you can change your mind after seeing the data without
 recollecting it. `DATA_FORMAT.md` says so wherever the live number appears.
 
 **World landmarks for measuring, image landmarks for drawing.** MediaPipe's
-image coordinates are normalised separately by width and height, so distances in
+image coordinates are normalized separately by width and height, so distances in
 those units are distorted by the frame's aspect ratio and by how far the
 participant sits from the camera. World landmarks are metric. Aperture is
 additionally divided by each participant's own wrist-to-knuckle distance, making
@@ -79,9 +79,9 @@ twenty times too high, because:
   two taps that never happened.
 
 All three are now handled: intervals spanning a gap are dropped, the rate
-denominator is `analysed_sec`, and a closure must have valid data on both sides
+denominator is `analyzed_sec`, and a closure must have valid data on both sides
 (`edge_guard_seconds`) to be believed. After the fix the dropout trial's metrics
-are within 1.5% of the clean ones. In a patient study the original behaviour
+are within 1.5% of the clean ones. In a patient study the original behavior
 would have read as a clinical finding rather than a camera problem, which is why
 it is written up here.
 
@@ -113,7 +113,7 @@ into a DOM element positioned over the video, and experiments receive a
   confirming every screen transition, per-trial chunk upload, and the session
   document's shape.
 - **Round trip.** A synthetic hand tapping at exactly 4.0 Hz was recorded
-  through the real browser recorder, chunked, reassembled, and analysed: 3.93
+  through the real browser recorder, chunked, reassembled, and analyzed: 3.93
   and 4.00 Hz out.
 
 `make_example_data.py` is included partly because it was the test harness. It

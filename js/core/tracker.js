@@ -25,7 +25,7 @@ let visionFileset = null;   // shared WASM runtime, loaded once
  * The returned `track(video, tMs)` gives you:
  *   {
  *     landmarks:      [[{x,y,z}, ...21], ...]   image coords, 0..1, for drawing
- *     worldLandmarks: [[{x,y,z}, ...21], ...]   metres, origin at hand centre,
+ *     worldLandmarks: [[{x,y,z}, ...21], ...]   metres, origin at hand center,
  *                                               use these for real measurements
  *     handedness:     ["Left"|"Right", ...]     (hand tracker only)
  *   }

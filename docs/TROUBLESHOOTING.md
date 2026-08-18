@@ -3,7 +3,7 @@
 Run `check.html` first. It tests each part of the setup in order and names the
 step that failed. Most of what follows is what that page will tell you.
 
-This is organised by the message you are seeing.
+This is organized by the message you are seeing.
 
 ---
 
@@ -74,7 +74,7 @@ In rough order of how often each one is the cause:
 1. Lighting. A window behind the participant turns them into a silhouette. The
    light should come from in front of them.
 2. Distance. About 40 to 60 cm from the camera works well.
-3. Background. Busy or skin-coloured backgrounds make detection less reliable.
+3. Background. Busy or skin-colored backgrounds make detection less reliable.
 4. The wrong camera. On a machine with more than one, the browser may have
    picked a different one. Change it using the camera icon in the address bar.
 

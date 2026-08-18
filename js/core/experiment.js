@@ -388,12 +388,12 @@ const HAND_BONES = [
   [0,17],
 ];
 
-export function drawLandmarks(ctx, canvas, landmarks, colour = "#4ade80") {
+export function drawLandmarks(ctx, canvas, landmarks, color = "#4ade80") {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   if (!landmarks) return;
   const W = canvas.width, H = canvas.height;
 
-  ctx.strokeStyle = colour;
+  ctx.strokeStyle = color;
   ctx.lineWidth = 3;
   if (landmarks.length === 21) {
     for (const [a, b] of HAND_BONES) {

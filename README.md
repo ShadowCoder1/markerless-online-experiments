@@ -35,7 +35,7 @@ firestore.rules         paste into the Firebase console (SETUP.md step 4)
 js/core/                camera, tracker, recorder, uploads, screen flow
 experiments/            one file per experiment, plus _template.js
 analysis/               fetch, compute metrics, draw figures
-docs/                   setup, customisation, troubleshooting, data format
+docs/                   setup, customization, troubleshooting, data format
 ```
 
 ## Trying the analysis without collecting data
@@ -146,9 +146,9 @@ says this. Edit it to match what your ethics board approved.
 
 Open `check.html` first. It tests the camera, the model, your Firebase settings,
 sign-in, and a test write, and reports which step failed and what to do about
-it. [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) is organised by the error
+it. [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) is organized by the error
 message you are seeing.
 
-## Licence
+## License
 
 MIT. See [LICENSE](LICENSE).

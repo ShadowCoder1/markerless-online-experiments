@@ -198,7 +198,7 @@ experiment file instead.
 
 ## How it looks
 
-`css/style.css`. The colour variables at the top drive everything:
+`css/style.css`. The color variables at the top drive everything:
 
 ```css
 :root {

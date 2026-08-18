@@ -274,7 +274,7 @@ def dominant_frequency(t: np.ndarray, y: np.ndarray, params: TapParams) -> float
 # One trial, start to finish
 # ---------------------------------------------------------------------------
 
-def analyse_trial(trial: dict, params: TapParams | None = None) -> dict:
+def analyze_trial(trial: dict, params: TapParams | None = None) -> dict:
     """Everything above, applied to one trial. Returns a flat dict of numbers."""
     params = params or TapParams()
     frames = trial.get("frames", [])
@@ -316,17 +316,17 @@ def _summarise(taps: dict, t: np.ndarray, y: np.ndarray, params: TapParams) -> d
 
     # Time the hand was actually visible. Using this as the denominator stops a
     # camera dropout from looking like the participant slowed down.
-    analysed = float(np.isfinite(y).sum()) / params.resample_hz
+    analyzed = float(np.isfinite(y).sum()) / params.resample_hz
     # max(0, ...) because the sample count and the end-to-end duration differ by
     # one sample period on a trial with no dropouts at all.
-    lost = max(0.0, duration - analysed) if np.isfinite(duration) else np.nan
+    lost = max(0.0, duration - analyzed) if np.isfinite(duration) else np.nan
 
     out = {
         "n_taps": int(len(times)),
         "recorded_sec": _round(duration, 2),
-        "analysed_sec": _round(analysed, 2),
+        "analyzed_sec": _round(analyzed, 2),
         "lost_to_tracking_sec": _round(lost, 2),
-        "rate_hz": _round(len(times) / analysed if analysed > 0 else np.nan, 3),
+        "rate_hz": _round(len(times) / analyzed if analyzed > 0 else np.nan, 3),
         "fft_peak_hz": _round(dominant_frequency(t, y, params), 3),
         "iti_mean_ms": _round(_nanmean(itis), 1),
         "iti_sd_ms": _round(_nanstd(itis), 1),

@@ -73,7 +73,7 @@ export default {
   onFrame({ worldLandmarks, tMs, state, addEvent }) {
     if (!worldLandmarks) return {};   // hand not visible this frame
 
-    // World landmarks are in metres with the origin at the centre of the hand,
+    // World landmarks are in metres with the origin at the center of the hand,
     // so this distance does not change when the participant leans towards the
     // camera. That is why we use them instead of the on-screen coordinates.
     const apertureM = distance3d(

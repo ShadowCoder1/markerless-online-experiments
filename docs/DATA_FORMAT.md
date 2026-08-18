@@ -131,7 +131,7 @@ data/processed/settings.json       the detection settings used
 | Column | Meaning |
 |---|---|
 | `n_taps` | taps detected |
-| `rate_hz` | taps per second **of analysed time** |
+| `rate_hz` | taps per second **of analyzed time** |
 | `fft_peak_hz` | dominant frequency of the signal, found without peak detection, so it is an independent check on `rate_hz` |
 | `iti_mean_ms`, `iti_sd_ms`, `iti_cv` | inter-tap intervals: speed and rhythm variability |
 | `amplitude_mean/sd/cv` | how wide the fingers opened |
@@ -140,14 +140,14 @@ data/processed/settings.json       the detection settings used
 | `rate_slope_hz_per_tap` | whether tapping slowed across the trial |
 | `n_halts` | pauses longer than `halt_multiplier` × this person's median interval |
 | `detection_rate` | fraction of frames with a visible hand. Below ~0.9 deserves a look |
-| `analysed_sec` | time the hand was actually visible |
+| `analyzed_sec` | time the hand was actually visible |
 | `lost_to_tracking_sec` | time lost to dropouts |
 | `n_intervals_used` / `n_intervals_dropped` | intervals kept vs discarded for spanning a dropout |
 | `fps` | median frame rate achieved on that participant's machine |
 | `demo_*` | one column per question in `questions.js`. `id: "age"` becomes `demo_age` |
 
 **Tracking dropouts are excluded, not patched over.** `rate_hz` divides by
-`analysed_sec` rather than trial length, intervals spanning a gap are dropped
+`analyzed_sec` rather than trial length, intervals spanning a gap are dropped
 from the rhythm statistics, and a peak at the truncated edge of a gap is not
 counted as a tap. Without this, three seconds of lost tracking shows up as a
 movement halt and inflates rhythm variability by a factor of twenty. In a

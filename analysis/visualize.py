@@ -36,7 +36,7 @@ def plot_trial(session: dict, trial: dict, params: M.TapParams, out_dir: Path) -
         return None
     y = M.smooth(y_raw, params)
     taps = M.detect_taps(t, y, params)
-    summary = M.analyse_trial(trial, params)
+    summary = M.analyze_trial(trial, params)
 
     fig, axes = plt.subplots(3, 1, figsize=(11, 8),
                              gridspec_kw={"height_ratios": [2.2, 1, 1]})
@@ -133,7 +133,7 @@ def plot_group(rows: list[dict], out_dir: Path) -> Path | None:
         ("amplitude_decrement_pct_per_tap", "amplitude change (% per tap)", "#9467bd"),
     ]
 
-    for ax, (key, label, colour) in zip(axes, panels):
+    for ax, (key, label, color) in zip(axes, panels):
         by_hand: dict[str, list[float]] = {}
         for r in usable:
             v = r.get(key)
@@ -148,7 +148,7 @@ def plot_group(rows: list[dict], out_dir: Path) -> Path | None:
             vals = by_hand[name]
             jitter = np.random.default_rng(0).normal(0, 0.045, len(vals))
             ax.scatter(np.full(len(vals), i) + jitter, vals, s=26,
-                       color=colour, alpha=0.65, edgecolor="none")
+                       color=color, alpha=0.65, edgecolor="none")
             ax.hlines(np.mean(vals), i - 0.22, i + 0.22, color="#111", lw=2)
         ax.set_xticks(range(len(names)))
         ax.set_xticklabels(names)
@@ -194,7 +194,7 @@ def main() -> None:
             if path:
                 made += 1
                 print(f"  {path.name}")
-            rows.append({**M.analyse_trial(trial, params),
+            rows.append({**M.analyze_trial(trial, params),
                          "participantId": session.get("participantId")})
 
     group = plot_group(rows, out_dir)

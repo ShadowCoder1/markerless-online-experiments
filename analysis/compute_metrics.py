@@ -75,7 +75,7 @@ def main() -> None:
         for key, value in (session.get("demographics") or {}).items():
             who[f"demo_{key}"] = ", ".join(map(str, value)) if isinstance(value, list) else value
         for trial in session.get("trials", []):
-            trial_rows.append({**who, **M.analyse_trial(trial, params)})
+            trial_rows.append({**who, **M.analyze_trial(trial, params)})
 
             # Per-tap detail, for anyone who wants to model tap-by-tap.
             frames = trial.get("frames", [])
@@ -128,7 +128,7 @@ def _warn_about_bad_trials(rows: list[dict]) -> None:
             problems.append(f"  {label}: only {r.get('n_taps')} taps detected")
 
     if problems:
-        print("\nWorth a look before you analyse these:")
+        print("\nWorth a look before you analyze these:")
         print("\n".join(problems))
         print("\nPlot them with:  python analysis/visualize.py")
 
