@@ -8,7 +8,10 @@ Built on [MediaPipe](https://ai.google.dev/edge/mediapipe) for tracking and
 [Firebase](https://firebase.google.com/) for storage. There is no build step and
 no `npm install` — you edit a file and refresh the page.
 
-A complete **finger-tapping** experiment is included and ready to run.
+A complete **finger-tapping** experiment is included and ready to run:
+**[try it live](https://shadowcoder1.github.io/markerless-online-experiments/)**
+(it will ask for your camera, then stop at the Firebase step — that part is
+yours to set up).
 
 ---
 

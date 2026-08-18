@@ -86,8 +86,10 @@ export const RECORDING = {
   // floor of the tracker and roughly halves the storage cost.
   decimals: 4,
 
-  // Save a copy of the data to the participant's computer as well as Firebase.
-  // Useful while piloting; usually turned off for real data collection.
+  // Also hand the participant a JSON copy of their session summary (the same
+  // document that goes to Firebase: identity, settings, and the per-trial
+  // numbers). The raw frame-by-frame landmarks are NOT included -- those only
+  // go to Firebase. Useful while piloting; leave off for real collection.
   alsoDownloadLocally: false,
 };
 

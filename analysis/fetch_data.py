@@ -152,7 +152,11 @@ def main() -> None:
 
     # A session folder with chunks but no session document is someone who quit
     # partway through. Surfacing that is better than quietly losing them.
-    known = {s.id for s in sessions}
+    #
+    # This has to look at ALL session documents, not just the ones downloaded
+    # above: with --experiment set, every session from a different experiment
+    # would otherwise look like a dropout. select([]) fetches ids only.
+    known = {s.id for s in db.collection("sessions").select([]).stream()}
     orphans = [
         d.id for d in db.collection("sessions").list_documents()
         if d.id not in known and not d.id.startswith("_selftest")
