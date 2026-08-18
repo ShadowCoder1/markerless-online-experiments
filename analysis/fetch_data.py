@@ -128,11 +128,15 @@ def main() -> None:
 
         stored = json.loads(target.read_text(encoding="utf-8"))
         for trial in stored.get("trials", []):
+            demographics = stored.get("demographics") or {}
             index_rows.append({
                 "sessionId": session_id,
                 "participantId": stored.get("participantId"),
                 "experimentId": stored.get("experimentId"),
                 "startedAt": stored.get("startedAt"),
+                "consentedAt": (stored.get("consent") or {}).get("agreedAt"),
+                "age": demographics.get("age"),
+                "dominantHand": demographics.get("dominantHand"),
                 "trialIndex": trial.get("index"),
                 "trialId": trial.get("id"),
                 "hand": trial.get("hand"),

@@ -12,6 +12,12 @@ build step: you edit a file and reload the page.
 A finger-tapping experiment is included and works as-is. You can
 [try it here](https://shadowcoder1.github.io/markerless-online-experiments/).
 
+Participants see the consent form first, then a page of demographic questions,
+then the task. The consent form is a PDF you replace with your own. The
+questions live in `questions.js` and are meant to be edited: add one, delete
+one, or change the choices, and reload. See
+[docs/CUSTOMIZE.md](docs/CUSTOMIZE.md#the-questions-asked-before-the-task).
+
 Until you connect a Firebase project, the site runs in demo mode. The task works
 and you see your tap count as you go, but nothing is uploaded. You can download
 your own session at the end and run the analysis scripts on it.
@@ -21,7 +27,9 @@ your own session at the end and run the analysis scripts on it.
 ```
 index.html              the page participants see
 check.html              tests your setup and reports what is wrong
-config.js               the file you edit
+config.js               study settings, Firebase keys, consent statements
+questions.js            the demographic questions, written to be edited
+consent/                the consent form participants read
 firestore.rules         paste into the Firebase console (SETUP.md step 4)
 
 js/core/                camera, tracker, recorder, uploads, screen flow

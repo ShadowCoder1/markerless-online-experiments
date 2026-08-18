@@ -1,11 +1,11 @@
-# I want to change…
+# Making changes
 
 Each entry says which file to open and what to change. Nothing here needs a
 rebuild. Save the file and reload the page.
 
 ---
 
-## …the wording participants see
+## The wording participants see
 
 | What | Where |
 |---|---|
@@ -15,7 +15,119 @@ rebuild. Save the file and reload the page.
 | The prompt during a trial | the `prompt` field on each entry in `trials` |
 | Everything else (buttons, screens) | `index.html`, which is plain HTML |
 
-## …how long, or how many, the trials are
+## The questions asked before the task
+
+Open `questions.js`. It is a list, and each entry is one question. Add entries,
+delete entries, or move them around, then reload the page. Nothing else needs
+changing: the form builds itself, checks the required answers, and saves what
+people enter.
+
+### Adding a question
+
+Copy an entry and change it:
+
+```js
+{ id: "yearsPlayingPiano",
+  label: "Years of piano experience",
+  type: "number",
+  min: 0,
+  max: 90 },
+```
+
+Every question needs an `id` and a `label`. The `id` becomes the column name in
+your results, so keep it short and without spaces, and do not use the same one
+twice.
+
+### Adding or changing the choices
+
+The `options` list is what appears in the drop-down. Edit it as you would any
+list:
+
+```js
+{ id: "dominantHand",
+  label: "Dominant hand",
+  type: "select",
+  required: true,
+  options: ["Right", "Left", "Ambidextrous", "Prefer not to say"] },
+```
+
+### Deleting a question
+
+Delete the whole entry, from its opening `{` to its closing `},`. To remove the
+demographics page altogether:
+
+```js
+export const DEMOGRAPHIC_QUESTIONS = [];
+```
+
+### The kinds of question available
+
+| `type` | What the participant sees | Needs `options` |
+|---|---|---|
+| `"select"` | a drop-down | yes |
+| `"radio"` | all the choices at once, pick one | yes |
+| `"checkboxes"` | all the choices at once, pick any number | yes |
+| `"number"` | a box that only accepts numbers | no |
+| `"text"` | one line of text | no |
+| `"textarea"` | a larger box for a longer answer | no |
+
+### Settings you can add to any question
+
+| Setting | Effect |
+|---|---|
+| `required: true` | they cannot continue without answering, and a red asterisk is shown |
+| `help: "..."` | smaller grey text under the label |
+| `placeholder: "..."` | greyed-out example inside the box |
+| `min:` and `max:` | allowed range, for `"number"` questions |
+
+### One special id
+
+A question with the id `participantId` is also used as the participant's ID in
+your data. If they arrived from Prolific it is filled in for them already. If
+they leave it blank they are given a random anonymous ID. Delete the question if
+you would rather not ask.
+
+### Where the answers end up
+
+Answers are saved under `demographics` in each session, and
+`compute_metrics.py` turns them into columns named `demo_` followed by the
+question id. A question with `id: "age"` becomes the column `demo_age` in
+`trial_metrics.csv`. The prefix means a question can never collide with the name
+of a measurement.
+
+Questions left blank are left out rather than saved as an empty value, so an
+unanswered optional question shows up as a missing value in your table.
+
+## The consent form
+
+The included form is the one from Prof. Tsay's lab at Carnegie Mellon. Replace
+`consent/consent-form.pdf` with your own approved document, keeping the same
+filename, and it will be shown instead. To use a different filename or folder,
+change `CONSENT.pdf` in `config.js`.
+
+The statements participants have to tick are separate from the document:
+
+```js
+export const CONSENT = {
+  pdf: "consent/consent-form.pdf",
+  affirmations: [
+    "I am age 18 or older.",
+    "I have read and understand the information above.",
+    "I want to participate in this research and continue with the task.",
+  ],
+};
+```
+
+Each line becomes a checkbox, and the Continue button stays disabled until all
+of them are ticked. Edit the wording to match your own form. The exact wording
+agreed to is saved with every session along with the time, so your records show
+what each participant actually saw.
+
+The short paragraph above the document is `STUDY.consentIntroHtml` in
+`config.js`. Setting `CONSENT.pdf` to `null` shows the statements on their own
+with no document.
+
+## How long the trials are, and how many
 
 `experiments/finger-tapping.js` → `trials`. Each entry is one trial:
 
@@ -40,7 +152,7 @@ trials: [
 ],
 ```
 
-## …which body part is tracked
+## Which body part is tracked
 
 In your experiment file:
 
@@ -57,7 +169,7 @@ To track both hands: `trackerOptions: { numHands: 2 }`. Note that `onFrame`
 receives only the first detected hand; for two-handed tasks, read
 `res.landmarks[1]` by editing `recordTrial` in `js/core/experiment.js`.
 
-## …what counts as a tap
+## What counts as a tap
 
 Two separate places, on purpose:
 
@@ -75,7 +187,7 @@ python analysis/compute_metrics.py --prominence 0.20 --min-iti 120
 Raise `prominence_fraction` if noise is being counted as taps; lower it if small
 late taps are being missed. Always check the change against the figures.
 
-## …which measurements come out
+## Which measurements come out
 
 `analysis/metrics.py` → `_summarise()`. Add a line, re-run
 `compute_metrics.py`, and it appears as a new column in `trial_metrics.csv`.
@@ -84,7 +196,7 @@ For something you want computed *during* the session (so the participant can see
 it, or so it lands in the small session document), use `onTrialEnd` in your
 experiment file instead.
 
-## …how it looks
+## How it looks
 
 `css/style.css`. The colour variables at the top drive everything:
 
@@ -99,7 +211,7 @@ experiment file instead.
 
 For a light theme, swap `--bg` to `#ffffff` and `--text` to `#111`.
 
-## …how much data is recorded
+## How much data is recorded
 
 `config.js` → `RECORDING`.
 
@@ -111,7 +223,7 @@ For a light theme, swap `--bg` to `#ffffff` and `--text` to `#111`.
 - `alsoDownloadLocally: true`: also give the participant a JSON copy. Useful
   while piloting; turn it off for real collection.
 
-## …running more than one experiment at the same time
+## Running more than one experiment at once
 
 Every experiment lives in its own file, and the URL picks which one runs:
 
@@ -129,7 +241,7 @@ python analysis/fetch_data.py --experiment my-task
 
 downloads only that one.
 
-## …assigning participants to conditions
+## Assigning participants to conditions
 
 Add `?condition=fast` to the link and it is saved with the session, ready to
 group by later. Inside an experiment, read it with:

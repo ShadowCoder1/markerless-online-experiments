@@ -26,6 +26,17 @@ Written **once, at the very end** of a session.
   "condition": null,             // from ?condition= in the URL
   "startedAt": "2026-01-18T14:30:52.123Z",
   "finishedAt": "<server timestamp>",
+
+  "consent": {
+    "document": "consent/consent-form.pdf",   // which form they were shown
+    "agreedTo": ["I am age 18 or older.", "..."],  // the exact wording ticked
+    "agreedAt": "2026-01-18T14:29:40.010Z"
+  },
+
+  // Answers to the questions in questions.js, keyed by question id.
+  // Unanswered optional questions are absent rather than empty.
+  "demographics": { "age": 29, "dominantHand": "Left", "device": "Laptop" },
+
   "trials": [
     {
       "index": 0,
@@ -133,6 +144,7 @@ data/processed/settings.json       the detection settings used
 | `lost_to_tracking_sec` | time lost to dropouts |
 | `n_intervals_used` / `n_intervals_dropped` | intervals kept vs discarded for spanning a dropout |
 | `fps` | median frame rate achieved on that participant's machine |
+| `demo_*` | one column per question in `questions.js`. `id: "age"` becomes `demo_age` |
 
 **Tracking dropouts are excluded, not patched over.** `rate_hz` divides by
 `analysed_sec` rather than trial length, intervals spanning a gap are dropped

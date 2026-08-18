@@ -12,7 +12,9 @@
  * still stored, as nulls, so gaps in your data stay visible instead of silently
  * disappearing. */
 
-import { STUDY, RECORDING, ACTIVE_EXPERIMENT } from "../../config.js";
+import { STUDY, CONSENT, RECORDING, ACTIVE_EXPERIMENT } from "../../config.js";
+import { DEMOGRAPHIC_QUESTIONS } from "../../questions.js";
+import { renderForm, readForm, focusField } from "./form.js";
 import { startCamera, stopCamera } from "./camera.js";
 import { createTracker } from "./tracker.js";
 import { Recorder } from "./recorder.js";
@@ -55,22 +57,51 @@ async function run(exp) {
     );
   }
 
-  /* ---- 1. Welcome + consent ------------------------------------------- */
+  /* ---- 1. Consent -------------------------------------------------------
+   * The consent document comes first, before anything else happens and before
+   * the camera is touched. Each statement in CONSENT.affirmations has to be
+   * ticked, and which ones were agreed to is stored with the session. */
   ui.setText("#study-title", STUDY.title);
   ui.setText("#study-lab", STUDY.labName);
-  ui.setHtml("#consent-text", STUDY.consentHtml);
+  ui.setHtml("#consent-intro", STUDY.consentIntroHtml ?? "");
   ui.setText("#experiment-title", exp.title);
 
-  // Only ask for an ID if the URL did not already supply one.
-  const idBlock = ui.$("#manual-id-block");
-  if (participant.participantId) idBlock.style.display = "none";
+  if (CONSENT.pdf) {
+    ui.$("#consent-doc").src = CONSENT.pdf;
+    ui.$("#consent-download").href = CONSENT.pdf;
+  } else {
+    ui.$("#consent-doc-wrap").hidden = true;
+  }
 
-  ui.showScreen("screen-welcome");
-  await ui.waitForClick("#btn-consent");
+  const agreed = await collectConsent(CONSENT.affirmations ?? []);
+  const consentRecord = {
+    document: CONSENT.pdf ?? null,
+    agreedTo: agreed,
+    agreedAt: new Date().toISOString(),
+  };
 
+  /* ---- 2. Demographics ---------------------------------------------------
+   * Built from questions.js. Edit that file to change what is asked. */
+  let demographics = {};
+  if (DEMOGRAPHIC_QUESTIONS.length) {
+    const formEl = ui.$("#demographics-form");
+    // If they came from Prolific, fill their ID in rather than asking twice.
+    renderForm(formEl, DEMOGRAPHIC_QUESTIONS,
+               participant.participantId ? { participantId: participant.participantId } : {});
+    ui.showScreen("screen-demographics");
+
+    while (true) {
+      await ui.waitForClick("#btn-demographics");
+      const { ok, values, firstError } = readForm(formEl, DEMOGRAPHIC_QUESTIONS);
+      if (ok) { demographics = values; break; }
+      focusField(formEl, firstError);
+    }
+  }
+
+  // A question with id "participantId" doubles as the participant's ID.
   if (!participant.participantId) {
-    const typed = ui.$("#manual-id-input").value.trim();
-    participant.participantId = typed || `anon_${Math.random().toString(36).slice(2, 8)}`;
+    participant.participantId = demographics.participantId
+      || `anon_${Math.random().toString(36).slice(2, 8)}`;
   }
 
   /* ---- 2. Firebase (optional) ------------------------------------------ */
@@ -181,6 +212,8 @@ async function run(exp) {
     prolific: participant.prolific,
     condition: participant.condition,
     startedAt,
+    consent: consentRecord,
+    demographics,
     trials: trialSummaries,
     settings: { recording: RECORDING, trackerOptions: exp.trackerOptions ?? {} },
     environment: {
@@ -224,6 +257,36 @@ async function run(exp) {
     await ui.sleep(5000);
     location.href = STUDY.completionRedirectUrl;
   }
+}
+
+/* -------------------------------------------------------------------------
+ * Draw one checkbox per consent statement and wait until all are ticked.
+ * Returns the statements that were agreed to, so the record stored with the
+ * session is the wording the participant actually saw.
+ * ---------------------------------------------------------------------- */
+async function collectConsent(statements) {
+  const box = ui.$("#consent-affirmations");
+  const button = ui.$("#btn-consent");
+  box.innerHTML = "";
+
+  const boxes = statements.map((text, i) => {
+    const row = document.createElement("label");
+    row.className = "q-choice affirm";
+    const input = document.createElement("input");
+    input.type = "checkbox";
+    input.id = `affirm-${i}`;
+    row.append(input, document.createTextNode(" " + text));
+    box.append(row);
+    return input;
+  });
+
+  const refresh = () => { button.disabled = !boxes.every((b) => b.checked); };
+  boxes.forEach((b) => b.addEventListener("change", refresh));
+  refresh();
+
+  ui.showScreen("screen-consent");
+  await ui.waitForClick("#btn-consent");
+  return statements.filter((_, i) => boxes[i].checked);
 }
 
 /* -------------------------------------------------------------------------

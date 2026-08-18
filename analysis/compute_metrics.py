@@ -68,6 +68,12 @@ def main() -> None:
             "startedAt": session.get("startedAt"),
             "condition": session.get("condition"),
         }
+
+        # Whatever was asked in questions.js becomes a column, prefixed with
+        # "demo_" so a question can never collide with a metric name. A question
+        # with id "age" becomes the column "demo_age".
+        for key, value in (session.get("demographics") or {}).items():
+            who[f"demo_{key}"] = ", ".join(map(str, value)) if isinstance(value, list) else value
         for trial in session.get("trials", []):
             trial_rows.append({**who, **M.analyse_trial(trial, params)})
 

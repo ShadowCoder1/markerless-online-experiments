@@ -6,6 +6,9 @@
  *  2. Open check.html to confirm everything works.
  *  3. Open index.html to run the experiment.
  *
+ *  The demographic questions live in a separate file, questions.js, because
+ *  those are the ones you are most likely to change.
+ *
  *  Everything in this file is safe to commit to a public repo. Firebase web
  *  API keys are public identifiers, NOT secrets, your data is protected by
  *  firestore.rules, not by hiding this key. (This surprises people. It is
@@ -47,30 +50,42 @@ export const STUDY = {
   labName: "Your Lab Name",
   contactEmail: "you@university.edu",
 
-  // Consent text shown before the camera turns on. EDIT THIS to match the
-  // wording your IRB approved. Basic HTML is allowed.
-  consentHtml: `
-    <p>In this study you will be asked to perform simple hand movements in
-    front of your webcam.</p>
-    <p><strong>What we record.</strong> We do <em>not</em> record or upload any
-    video or images. Your webcam feed is processed entirely on your own
-    computer. Only the numeric positions of your hand joints (x, y and z
-    coordinates) are sent to our server.</p>
-    <p>Participation is voluntary and you may stop at any time by closing this
-    page.</p>`,
+  // Shown above the consent form as a short lead-in.
+  consentIntroHtml: `
+    <p>Please read the consent form below before taking part. You can
+    <a href="consent/consent-form.pdf" target="_blank" rel="noopener">open it in
+    a new tab</a> or download it to keep.</p>`,
 
   // Where to send participants when they finish. Prolific gives you a URL
   // like https://app.prolific.com/submissions/complete?cc=XXXXXXXX
   // Leave as null to just show a thank-you screen with no redirect.
   completionRedirectUrl: null,
 
-  // Require participants to pass the camera check before starting.
-  requireCameraCheck: true,
 };
 
 
 /* -----------------------------------------------------------------------------
- * 4. RECORDING SETTINGS, most people never need to change these
+ * 4. CONSENT
+ * ---------------------------------------------------------------------------*/
+export const CONSENT = {
+  // The consent document participants read. Replace this file with your own
+  // approved form, or point this at a different path. Set to null to show only
+  // the statements below with no document.
+  pdf: "consent/consent-form.pdf",
+
+  // Each of these becomes a checkbox that must be ticked before continuing.
+  // These match the statements at the end of the included form. Change them to
+  // match yours. Which ones were agreed to is saved with every session.
+  affirmations: [
+    "I am age 18 or older.",
+    "I have read and understand the information above.",
+    "I want to participate in this research and continue with the task.",
+  ],
+};
+
+
+/* -----------------------------------------------------------------------------
+ * 5. RECORDING SETTINGS: most people never need to change these
  * ---------------------------------------------------------------------------*/
 export const RECORDING = {
   // Target camera resolution. Lower = faster on weak laptops.
@@ -95,7 +110,7 @@ export const RECORDING = {
 
 
 /* -----------------------------------------------------------------------------
- * 5. MEDIAPIPE VERSIONS, pinned on purpose
+ * 6. MEDIAPIPE VERSIONS, pinned on purpose
  * ---------------------------------------------------------------------------
  * Pinned so that your study does not silently change halfway through data
  * collection because Google shipped a new model. Only bump these between

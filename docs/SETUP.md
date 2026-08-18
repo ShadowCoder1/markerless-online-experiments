@@ -89,6 +89,17 @@ and it lets the security rules tell a real participant apart from a random bot.
 Reload `check.html`. Every check should now pass. If one does not, the page says
 which step to go back to.
 
+## Step 4b. Use your own consent form and questions
+
+The included consent form is the one from Prof. Tsay's lab at Carnegie Mellon,
+and it is there as an example. Replace `consent/consent-form.pdf` with the
+document your own ethics board approved, keeping the same filename.
+
+Then edit `CONSENT.affirmations` in `config.js` so the statements participants
+tick match the ones on your form, and edit `questions.js` so the demographic
+questions are the ones you want to ask. Both files are written to be edited and
+[docs/CUSTOMIZE.md](CUSTOMIZE.md) explains each setting.
+
 ## Step 5. Run it on yourself
 
 Open <http://localhost:8000/>. Do the whole thing once, start to finish. Then:
@@ -138,7 +149,8 @@ completionRedirectUrl: "https://app.prolific.com/submissions/complete?cc=XXXXXXX
 
 - [ ] `check.html` passes on the public URL, not just on localhost
 - [ ] You have run the study on yourself and looked at the figure
-- [ ] The consent text in `config.js` matches what your IRB approved
+- [ ] `consent/consent-form.pdf` is your own approved form, not the example
+- [ ] `CONSENT.affirmations` matches the statements on your form
 - [ ] `completionRedirectUrl` is set, and you have tested the redirect
 - [ ] The marked taps in the figure line up with taps you actually made
 - [ ] You have deleted your pilot sessions, or noted their IDs so you can exclude them

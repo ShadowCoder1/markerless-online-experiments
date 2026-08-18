@@ -199,3 +199,68 @@ table.results td { font-variant-numeric: tabular-nums; }
   border-bottom-color: #4f8cff;
   color: #c8d4e8;
 }
+
+/* ---- consent form ------------------------------------------------------ */
+#consent-doc-wrap {
+  margin: 18px 0 8px;
+  border: 1px solid #2a2f3a;
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: #fff;
+}
+#consent-doc {
+  display: block;
+  width: 100%;
+  height: 62vh;
+  min-height: 380px;
+  border: 0;
+}
+
+.q-choice {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 8px 0;
+  cursor: pointer;
+  line-height: 1.5;
+}
+.q-choice input { margin-top: .35em; flex: none; width: 17px; height: 17px; accent-color: var(--accent); }
+
+.affirm {
+  padding: 12px 14px;
+  margin-top: 8px;
+  background: var(--panel);
+  border-radius: var(--radius);
+}
+
+/* ---- generated questions ----------------------------------------------- */
+.q { margin-top: 22px; }
+.q > label { display: block; font-weight: 600; margin-bottom: 6px; }
+.q .req { color: var(--bad); }
+.q-help { margin: 0 0 8px; color: var(--subtle); font-size: .88rem; }
+
+.q input[type="text"],
+.q input[type="number"],
+.q select,
+.q textarea {
+  width: 100%;
+  padding: 12px 14px;
+  font: inherit;
+  color: var(--text);
+  background: var(--panel);
+  border: 1px solid #2a2f3a;
+  border-radius: var(--radius);
+}
+.q select { appearance: none; cursor: pointer; }
+.q textarea { resize: vertical; }
+.q input:focus, .q select:focus, .q textarea:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.q-group { background: var(--panel); border-radius: var(--radius); padding: 6px 14px; }
+
+.q-error { margin: 6px 0 0; color: var(--bad); font-size: .88rem; }
+.bad-field input, .bad-field select, .bad-field textarea, .bad-field .q-group {
+  border-color: var(--bad);
+}

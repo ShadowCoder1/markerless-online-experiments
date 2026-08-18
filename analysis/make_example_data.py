@@ -97,7 +97,7 @@ def make_trial(index: int, trial_id: str, hand: str, *, duration=15.0, fps=30.0,
 
 
 def make_session(participant: str, seed: int, *, right_rate: float, left_rate: float,
-                 decrement: float, jitter: float, dropout=()) -> dict:
+                 decrement: float, jitter: float, dropout=(), demographics=None) -> dict:
     rng = np.random.default_rng(seed)
     return {
         "sessionId": f"example_{participant}",
@@ -107,6 +107,14 @@ def make_session(participant: str, seed: int, *, right_rate: float, left_rate: f
         "participantSource": "example",
         "startedAt": f"2026-01-0{seed % 9 + 1}T10:00:00.000Z",
         "schemaVersion": 1,
+        "consent": {
+            "document": "consent/consent-form.pdf",
+            "agreedTo": ["I am age 18 or older.",
+                         "I have read and understand the information above.",
+                         "I want to participate in this research and continue with the task."],
+            "agreedAt": f"2026-01-0{seed % 9 + 1}T09:58:00.000Z",
+        },
+        "demographics": demographics or {},
         "trials": [
             make_trial(0, "right", "right", rate_hz=right_rate,
                        decrement=decrement, jitter=jitter, rng=rng),
@@ -131,11 +139,17 @@ def main() -> None:
     # a strong decrement, and one whose camera lost the hand for a few seconds.
     people = [
         dict(participant="EX01", seed=1, right_rate=5.2, left_rate=4.8,
-             decrement=0.10, jitter=0.05),
+             decrement=0.10, jitter=0.05,
+             demographics={"age": 24, "sexAtBirth": "Female", "dominantHand": "Right",
+                           "device": "Laptop", "participantId": "EX01"}),
         dict(participant="EX02", seed=2, right_rate=3.4, left_rate=3.0,
-             decrement=0.35, jitter=0.14),
+             decrement=0.35, jitter=0.14,
+             demographics={"age": 67, "sexAtBirth": "Male", "dominantHand": "Right",
+                           "device": "Desktop computer", "participantId": "EX02"}),
         dict(participant="EX03", seed=3, right_rate=4.3, left_rate=4.1,
-             decrement=0.20, jitter=0.08, dropout=[(6.0, 9.0)]),
+             decrement=0.20, jitter=0.08, dropout=[(6.0, 9.0)],
+             demographics={"age": 41, "sexAtBirth": "Female", "dominantHand": "Left",
+                           "device": "Laptop", "participantId": "EX03"}),
     ]
 
     for person in people:
