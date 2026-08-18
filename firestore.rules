@@ -1,0 +1,69 @@
+rules_version = '2';
+
+/* =============================================================================
+ *  Security rules for your study database.
+ * =============================================================================
+ *
+ *  COPY EVERYTHING IN THIS FILE into:
+ *    Firebase Console -> Build -> Firestore Database -> Rules -> Publish
+ *
+ *  WHAT THESE RULES DO
+ *    - Participants may CREATE their own session and its data chunks.
+ *    - Nobody using the website can READ, EDIT, or DELETE anything, ever —
+ *      including their own data, and including you.
+ *    - You read the data with analysis/fetch_data.py, which authenticates as
+ *      you (a project owner) and bypasses these rules entirely.
+ *
+ *  WHY NOT "TEST MODE"?
+ *  Firebase offers a test mode that allows anyone on the internet to read and
+ *  write everything, and then stops working after 30 days. Studies have been
+ *  lost to both halves of that sentence. These rules do not expire.
+ * ===========================================================================*/
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    // Data may only be filed under the id of the participant writing it, so a
+    // participant cannot write data attributed to someone else.
+    function ownedByCaller() {
+      return request.resource.data.uid == request.auth.uid;
+    }
+
+    match /sessions/{sessionId} {
+
+      allow create: if signedIn()
+                    && ownedByCaller()
+                    && request.resource.data.keys().hasAll(
+                         ['uid', 'sessionId', 'experimentId', 'startedAt'])
+                    && request.resource.data.experimentId is string
+                    && request.resource.data.experimentId.size() <= 64
+                    && request.resource.data.participantId is string
+                    && request.resource.data.participantId.size() <= 128;
+
+      // Session documents are written once, at the end, and never touched
+      // again. Anything else is a bug or an attack.
+      allow read, update, delete: if false;
+
+      match /chunks/{chunkId} {
+
+        allow create: if signedIn()
+                      && ownedByCaller()
+                      && request.resource.data.frames is list
+                      // A cheap ceiling on how much one document can hold.
+                      // Raise it only if you also raise chunkFrames in config.js.
+                      && request.resource.data.frames.size() <= 2000;
+
+        allow read, update, delete: if false;
+      }
+    }
+
+    // Anything not explicitly allowed above is denied.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

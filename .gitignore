@@ -1,0 +1,12 @@
+# Participant data never belongs in git.
+data/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.ipynb_checkpoints/
+
+# macOS
+.DS_Store
