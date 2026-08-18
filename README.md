@@ -1,9 +1,9 @@
 # Markerless online experiments
 
-A starting point for running hand and body movement experiments over the web.
-Participants open a link, their webcam is analysed on their own computer, and
+Welcome! This is a starting point for running hand and body movement experiments over the web.
+Participants open a link, their webcam is analyzed on their own computer, and
 only the numeric positions of their joints are sent back to you. No video is
-uploaded, and there is nothing for them to install.
+saved, and there is nothing for them to install. You can change this at any time. 
 
 Tracking uses [MediaPipe](https://ai.google.dev/edge/mediapipe). Data is stored
 in [Firebase](https://firebase.google.com/). Analysis is in Python. There is no
