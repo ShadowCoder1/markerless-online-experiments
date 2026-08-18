@@ -1,7 +1,7 @@
 # I want to change…
 
 Each entry says which file to open and what to change. Nothing here needs a
-rebuild — save and reload the page.
+rebuild. Save the file and reload the page.
 
 ---
 
@@ -13,7 +13,7 @@ rebuild — save and reload the page.
 | Consent text | `config.js` → `STUDY.consentHtml` |
 | Task instructions | `experiments/finger-tapping.js` → `instructions` |
 | The prompt during a trial | the `prompt` field on each entry in `trials` |
-| Everything else (buttons, screens) | `index.html` — it is plain HTML |
+| Everything else (buttons, screens) | `index.html`, which is plain HTML |
 
 ## …how long, or how many, the trials are
 
@@ -50,8 +50,8 @@ trackerOptions: { numPoses: 1 },
 ```
 
 You then get 33 whole-body landmarks instead of 21 hand ones, and you index them
-with `POSE.LEFT_WRIST` and friends (see `js/core/tracker.js`). Everything else —
-recording, uploading, analysis plumbing — is unchanged.
+with names like `POSE.LEFT_WRIST` (see `js/core/tracker.js`). Recording,
+uploading and analysis are unchanged.
 
 To track both hands: `trackerOptions: { numHands: 2 }`. Note that `onFrame`
 receives only the first detected hand; for two-handed tasks, read
@@ -61,10 +61,12 @@ receives only the first detected hand; for two-handed tasks, read
 
 Two separate places, on purpose:
 
-- **The live counter participants see** — the constants at the bottom of
-  `experiments/finger-tapping.js` (`CLOSE_FRACTION`, `REFRACTORY_MS`, …).
-- **Your actual results** — `TapParams` at the top of `analysis/metrics.py`.
-  These are the ones that matter. You can also override them per run:
+- The live counter participants see is controlled by the constants at the bottom
+  of `experiments/finger-tapping.js` (`CLOSE_FRACTION`, `REFRACTORY_MS`, and so
+  on).
+- Your actual results come from `TapParams` at the top of
+  `analysis/metrics.py`. These are the ones that matter. You can also override
+  them for a single run:
 
 ```bash
 python analysis/compute_metrics.py --prominence 0.20 --min-iti 120
@@ -101,12 +103,12 @@ For a light theme, swap `--bg` to `#ffffff` and `--text` to `#111`.
 
 `config.js` → `RECORDING`.
 
-- `video: { width, height }` — lower it if participants report lag.
-- `decimals` — coordinate precision. 4 is already well below the tracker's noise.
-- `chunkFrames` — how many frames per Firestore document. **Only lower this**,
-  never raise it much: documents are capped at 1 MiB and a chunk that exceeds it
-  fails to upload. See [DATA_FORMAT.md](DATA_FORMAT.md).
-- `alsoDownloadLocally: true` — also hand the participant a JSON copy. Handy
+- `video: { width, height }`: lower this if participants report lag.
+- `decimals`: coordinate precision. 4 is already well below the tracker's noise.
+- `chunkFrames`: how many frames go in each Firestore document. Only lower this,
+  do not raise it much. Documents are capped at 1 MiB and a chunk that exceeds
+  that fails to upload. See [DATA_FORMAT.md](DATA_FORMAT.md).
+- `alsoDownloadLocally: true`: also give the participant a JSON copy. Useful
   while piloting; turn it off for real collection.
 
 ## …running more than one experiment at the same time

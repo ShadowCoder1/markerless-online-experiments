@@ -1,5 +1,5 @@
 /* =============================================================================
- *  finger-tapping.js — tap your index finger against your thumb, fast.
+ *  finger-tapping.js, tap your index finger against your thumb, fast.
  * =============================================================================
  *
  *  This is a complete, working experiment. Read it top to bottom: it is the
@@ -17,8 +17,7 @@
  *  The tap detection below runs live so the participant sees a counter go up.
  *  It is deliberately simple. The numbers you put in a paper should come from
  *  analysis/metrics.py, which re-derives every tap from the raw landmarks with
- *  parameters you can change afterwards. Detecting twice is not a mistake —
- *  it means you are never stuck with a threshold you chose before seeing data.
+ *  parameters you can change afterwards. Detecting twice is not a mistake, *  it means you are never stuck with a threshold you chose before seeing data.
  * ===========================================================================*/
 
 import { HAND, distance3d } from "../js/core/tracker.js";
@@ -35,7 +34,7 @@ export default {
   /* Shown once, before the first trial. Plain HTML. */
   instructions: `
     <p>You will tap your <strong>index finger against your thumb</strong>,
-    like you are pinching, over and over.</p>
+    like a pinching movement, over and over.</p>
     <ul>
       <li>Open your fingers <strong>as wide as you can</strong> between taps.</li>
       <li>Tap <strong>as fast as you can</strong>, and keep going for the whole
@@ -47,9 +46,9 @@ export default {
   /* One entry per trial. Add, remove, or reorder these freely. */
   trials: [
     { id: "right", hand: "right", durationSec: 15,
-      prompt: "Tap with your <strong>RIGHT</strong> hand — as fast and as wide as you can." },
+      prompt: "Tap with your <strong>RIGHT</strong> hand, as fast and as wide as you can." },
     { id: "left", hand: "left", durationSec: 15,
-      prompt: "Now tap with your <strong>LEFT</strong> hand — as fast and as wide as you can." },
+      prompt: "Now tap with your <strong>LEFT</strong> hand, as fast and as wide as you can." },
   ],
 
   /* --------------------------------------------------------------------

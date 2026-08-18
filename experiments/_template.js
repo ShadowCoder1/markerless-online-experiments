@@ -1,5 +1,5 @@
 /* =============================================================================
- *  _template.js — copy this file to start a new experiment.
+ *  _template.js, copy this file to start a new experiment.
  * =============================================================================
  *
  *  HOW TO USE IT
@@ -19,7 +19,7 @@
  *    onTrialEnd({...})     once per trial, when the timer runs out. Return
  *                          summary numbers for this trial.
  *
- *  All of them are optional. An experiment with only `trials` still runs — it
+ *  All of them are optional. An experiment with only `trials` still runs, it
  *  just records raw landmarks and nothing else, which is sometimes exactly
  *  what you want.
  * ===========================================================================*/
@@ -54,9 +54,9 @@ export default {
   },
 
   onFrame({ landmarks, worldLandmarks, handedness, tMs, trial, state, addEvent }) {
-    // `landmarks`      — on-screen positions, x and y between 0 and 1. Use for drawing.
-    // `worldLandmarks` — real-world positions in metres. Use for measuring.
-    // Both are null on frames where nothing was detected — always check.
+    // `landmarks`, on-screen positions, x and y between 0 and 1. Use for drawing.
+    // `worldLandmarks`, real-world positions in metres. Use for measuring.
+    // Both are null on frames where nothing was detected, always check.
     if (!worldLandmarks) return {};
 
     const someDistance = distance3d(

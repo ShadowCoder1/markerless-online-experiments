@@ -6,8 +6,8 @@ the session, so you can re-run it with different settings as many times as you
 like without collecting new data.
 
 WHAT IT MEASURES, and why each one is here
-    rate_hz              taps per second — overall speed
-    iti_*                inter-tap intervals — rhythm and its variability
+    rate_hz              taps per second, overall speed
+    iti_*                inter-tap intervals, rhythm and its variability
     amplitude_*          how wide the fingers opened on each tap
     amplitude_slope      whether amplitude shrinks across the trial. Clinicians
                          call this the sequence effect / decrement, and it is
@@ -41,7 +41,7 @@ WRIST, THUMB_TIP, INDEX_TIP, MIDDLE_MCP = 0, 4, 8, 9
 class TapParams:
     """Everything you might want to tune, in one place.
 
-    Change these and re-run compute_metrics.py — no new data collection needed.
+    Change these and re-run compute_metrics.py, no new data collection needed.
     """
 
     resample_hz: float = 60.0
@@ -230,8 +230,7 @@ def detect_taps(t: np.ndarray, y: np.ndarray, params: TapParams) -> dict:
         amplitudes.append(float(window.max() - y[close_idx]) if len(window) else np.nan)
 
     # Same for the intervals. An interval that spans a dropout tells you how
-    # long the camera lost the hand for, NOT how long the participant paused —
-    # counting it as either a slow tap or a movement halt would be wrong.
+    # long the camera lost the hand for, NOT how long the participant paused, # counting it as either a slow tap or a movement halt would be wrong.
     iti_valid = np.array(
         [bool(np.isfinite(y[a:b + 1]).all()) for a, b in zip(closures[:-1], closures[1:])],
         dtype=bool,
@@ -349,7 +348,7 @@ def _summarise(taps: dict, t: np.ndarray, y: np.ndarray, params: TapParams) -> d
     inst_rate = 1000.0 / itis if len(itis) else np.array([])
     out["rate_slope_hz_per_tap"] = _round(_slope(inst_rate), 6)
 
-    # Halts: the participant pausing. Only genuine intervals can qualify — an
+    # Halts: the participant pausing. Only genuine intervals can qualify, an
     # interval spanning a dropout was already excluded above.
     if len(itis) >= 3:
         median = float(np.nanmedian(itis))

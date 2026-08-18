@@ -1,4 +1,4 @@
-/* experiment.js — the runner.
+/* experiment.js: the runner.
  *
  * You should not need to change this file to build a new experiment. It takes
  * an experiment definition (see experiments/_template.js) and walks the
@@ -74,7 +74,7 @@ async function run(exp) {
   }
 
   /* ---- 2. Firebase (optional) ------------------------------------------ */
-  // If config.js has not been filled in, the study still runs — it just does
+  // If config.js has not been filled in, the study still runs, it just does
   // not save. That keeps the live demo usable by anyone who clicks the link.
   ui.showScreen("screen-loading");
   ui.setText("#loading-text", "Connecting…");
@@ -87,6 +87,9 @@ async function run(exp) {
 
   ui.setText("#loading-text", "Loading the hand tracking model (a few MB, first visit only)…");
   const tracker = await createTracker(exp.tracker ?? "hand", exp.trackerOptions ?? {});
+  if (tracker.delegate === "CPU") {
+    ui.$("#cpu-banner").hidden = false;
+  }
 
   const stage = ui.$("#stage");
   const canvas = ui.$("#overlay");
@@ -180,7 +183,13 @@ async function run(exp) {
     startedAt,
     trials: trialSummaries,
     settings: { recording: RECORDING, trackerOptions: exp.trackerOptions ?? {} },
-    environment: getEnvironment(),
+    environment: {
+      ...getEnvironment(),
+      // "GPU" or "CPU". CPU machines run at a lower frame rate, which is worth
+      // knowing before you wonder why one participant's data looks coarse.
+      trackerDelegate: tracker.delegate,
+      trackerErrors: tracker.errorCount,
+    },
     schemaVersion: 1,
   };
   await fb.saveSession(sessionId, sessionDoc);
@@ -244,7 +253,7 @@ async function positioningLoop(video, tracker, ctx, canvas, stage) {
       const heldFor = visibleSince ? performance.now() - visibleSince : 0;
       if (heldFor > 1500) {
         btn.disabled = false;
-        ui.setText("#position-status", "Looking good — you can continue.");
+        ui.setText("#position-status", "Looking good, you can continue.");
         ui.$("#position-status").className = "status good";
       } else {
         btn.disabled = true;

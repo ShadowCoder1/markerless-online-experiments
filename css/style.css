@@ -1,4 +1,4 @@
-/* style.css — deliberately plain. Change the colours at the top and the whole
+/* style.css, deliberately plain. Change the colours at the top and the whole
  * study restyles. Nothing here affects your data. */
 
 :root {
@@ -193,3 +193,9 @@ table.results tr:first-child th {
 }
 table.results tr:last-child th, table.results tr:last-child td { border-bottom: 0; }
 table.results td { font-variant-numeric: tabular-nums; }
+
+.banner.subtle-banner {
+  background: #1b2230;
+  border-bottom-color: #4f8cff;
+  color: #c8d4e8;
+}

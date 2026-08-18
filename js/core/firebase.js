@@ -1,4 +1,4 @@
-/* firebase.js — signs the participant in anonymously and saves their data.
+/* firebase.js: signs the participant in anonymously and saves their data.
  *
  * HOW THE DATA IS LAID OUT IN FIRESTORE
  *
@@ -13,7 +13,7 @@
  *
  * The session document is written LAST, once the participant has finished.
  * That means a session folder with chunks but no session document is someone
- * who dropped out partway — fetch_data.py reports those separately instead of
+ * who dropped out partway, fetch_data.py reports those separately instead of
  * silently mixing them into your dataset.
  *
  * See firestore.rules for the matching security rules. */
@@ -24,7 +24,7 @@ const SDK = "https://www.gstatic.com/firebasejs/12.17.1";
 
 let app = null, db = null, auth = null, uid = null;
 
-// False when config.js has not been filled in. The experiment still runs — it
+// False when config.js has not been filled in. The experiment still runs, it
 // just does not save anything. See initFirebase().
 let enabled = false;
 

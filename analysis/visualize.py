@@ -4,7 +4,7 @@
     python analysis/visualize.py
 
     data/figures/<session>_<trial>.png   the aperture trace with every detected
-                                         tap marked. LOOK AT THESE FIRST — they
+                                         tap marked. LOOK AT THESE FIRST, they
                                          are how you find out whether the tap
                                          detector agrees with your eyes.
     data/figures/_group_summary.png      rate, rhythm variability and decrement
@@ -54,7 +54,7 @@ def plot_trial(session: dict, trial: dict, params: M.TapParams, out_dir: Path) -
     trial_id, hand = trial.get("id"), trial.get("hand")
     label = trial_id if trial_id == hand or not hand else f"{trial_id} ({hand})"
     ax.set_title(
-        f"{session.get('participantId')} — {label}   "
+        f"{session.get('participantId')}, {label}   "
         f"{summary.get('rate_hz')} Hz · CV {summary.get('iti_cv')} · "
         f"detection {100 * (summary.get('detection_rate') or 0):.0f}%"
     )
@@ -68,7 +68,7 @@ def plot_trial(session: dict, trial: dict, params: M.TapParams, out_dir: Path) -
         ax.plot(x[ok], itis[ok], "o-", ms=4, color="#2ca02c", label="used")
         if (~ok).any():
             # These intervals span a tracking dropout, so they measure how long
-            # the camera lost the hand — not how long the participant paused.
+            # the camera lost the hand, not how long the participant paused.
             # The metrics ignore them and so should your eye.
             ax.plot(x[~ok], itis[~ok], "x", ms=9, mew=2, color="#f0ad4e",
                     label="excluded (tracking gap)")

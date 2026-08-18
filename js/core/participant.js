@@ -1,4 +1,4 @@
-/* participant.js — works out who this participant is and where to send them
+/* participant.js: works out who this participant is and where to send them
  * when they are done.
  *
  * PROLIFIC
@@ -32,7 +32,7 @@ export function getParticipant() {
   };
 }
 
-/** Which experiment file to load — ?exp=... beats config.js. */
+/** Which experiment file to load, ?exp=... beats config.js. */
 export function requestedExperiment(fallback) {
   const name = params.get("exp");
   // Only allow simple names, so a URL can never be used to load a script from

@@ -1,4 +1,4 @@
-/* tracker.js — a thin wrapper around MediaPipe Tasks Vision.
+/* tracker.js: a thin wrapper around MediaPipe Tasks Vision.
  *
  * Two things happen here:
  *   1. we download the WASM runtime + the model file (a few MB, cached after
@@ -30,7 +30,7 @@ let visionFileset = null;   // shared WASM runtime, loaded once
  *     handedness:     ["Left"|"Right", ...]     (hand tracker only)
  *   }
  * Each outer array has one entry per detected hand/person. It is EMPTY when
- * nothing was detected in that frame — always check `.landmarks.length`.
+ * nothing was detected in that frame, always check `.landmarks.length`.
  */
 export async function createTracker(kind = "hand", options = {}) {
   const { FilesetResolver, HandLandmarker, PoseLandmarker } =
@@ -41,51 +41,126 @@ export async function createTracker(kind = "hand", options = {}) {
   }
 
   if (kind === "hand") {
-    const landmarker = await HandLandmarker.createFromOptions(visionFileset, {
-      baseOptions: { modelAssetPath: MEDIAPIPE.models.hand, delegate: "GPU" },
+    const { landmarker, delegate } = await createWithFallback(HandLandmarker, visionFileset, {
+      baseOptions: { modelAssetPath: MEDIAPIPE.models.hand },
       runningMode: "VIDEO",
       numHands: options.numHands ?? 1,
       minHandDetectionConfidence: options.minDetectionConfidence ?? 0.5,
       minHandPresenceConfidence:  options.minPresenceConfidence  ?? 0.5,
       minTrackingConfidence:      options.minTrackingConfidence  ?? 0.5,
     });
-    return {
-      kind: "hand",
-      numLandmarks: 21,
-      track(video, tMs) {
-        const r = landmarker.detectForVideo(video, tMs);
-        return {
-          landmarks: r.landmarks ?? [],
-          worldLandmarks: r.worldLandmarks ?? [],
-          handedness: (r.handedness ?? []).map((h) => h[0]?.categoryName ?? "?"),
-        };
-      },
-      close: () => landmarker.close(),
-    };
+    return wrap("hand", 21, landmarker, delegate, (r) => ({
+      landmarks: r.landmarks ?? [],
+      worldLandmarks: r.worldLandmarks ?? [],
+      handedness: (r.handedness ?? []).map((h) => h[0]?.categoryName ?? "?"),
+    }));
   }
 
   if (kind === "pose") {
-    const landmarker = await PoseLandmarker.createFromOptions(visionFileset, {
-      baseOptions: { modelAssetPath: MEDIAPIPE.models.pose, delegate: "GPU" },
+    const { landmarker, delegate } = await createWithFallback(PoseLandmarker, visionFileset, {
+      baseOptions: { modelAssetPath: MEDIAPIPE.models.pose },
       runningMode: "VIDEO",
       numPoses: options.numPoses ?? 1,
     });
-    return {
-      kind: "pose",
-      numLandmarks: 33,
-      track(video, tMs) {
-        const r = landmarker.detectForVideo(video, tMs);
-        return {
-          landmarks: r.landmarks ?? [],
-          worldLandmarks: r.worldLandmarks ?? [],
-          handedness: [],
-        };
-      },
-      close: () => landmarker.close(),
-    };
+    return wrap("pose", 33, landmarker, delegate, (r) => ({
+      landmarks: r.landmarks ?? [],
+      worldLandmarks: r.worldLandmarks ?? [],
+      handedness: [],
+    }));
   }
 
   throw new Error(`Unknown tracker "${kind}". Use "hand" or "pose".`);
+}
+
+
+/* ---------------------------------------------------------------------------
+ * Try the GPU, fall back to the CPU.
+ *
+ * MediaPipe's GPU path needs a WebGL context, and there are plenty of real
+ * machines that cannot give it one: hardware acceleration switched off,
+ * a blocklisted driver, a virtual machine, a remote desktop, or simply too many
+ * WebGL contexts already open in other tabs. Those participants used to see
+ * "emscripten_webgl_create_context() returned error 0" and could not take part
+ * at all. The CPU path is slower but works everywhere, which matters far more
+ * for a study people join from their own computers.
+ *
+ * Which one was used is reported as `tracker.delegate`, stored with the session,
+ * and shown by check.html. CPU machines run at a lower frame rate, which is
+ * worth knowing when a participant's data looks unusual.
+ * -------------------------------------------------------------------------*/
+export async function createWithFallback(Landmarker, fileset, options) {
+  const failures = [];
+
+  for (const delegate of delegateOrder()) {
+    try {
+      const landmarker = await Landmarker.createFromOptions(fileset, {
+        ...options,
+        baseOptions: { ...options.baseOptions, delegate },
+      });
+      if (delegate === "CPU") {
+        console.warn(
+          "MediaPipe could not use the GPU on this machine, so it is running on " +
+          "the CPU instead. Everything works; the frame rate will be lower.\n" +
+          `GPU error was: ${failures[0]}`
+        );
+      }
+      return { landmarker, delegate };
+    } catch (err) {
+      failures.push(err?.message || String(err));
+    }
+  }
+
+  throw new Error(
+    "The hand tracking model could not start on this computer, on either the " +
+    "GPU or the CPU.\n\nTry a different browser (Chrome, Edge, or Firefox), " +
+    "close other tabs, and check that hardware acceleration is enabled in your " +
+    "browser settings.\n\nDetails: " + failures.join(" | ")
+  );
+}
+
+/** Which delegates to try, in order. See MEDIAPIPE.delegate in config.js. */
+export function delegateOrder() {
+  const fromUrl = typeof location !== "undefined"
+    ? new URLSearchParams(location.search).get("delegate")
+    : null;
+  const choice = String(fromUrl || MEDIAPIPE.delegate || "auto").toUpperCase();
+
+  if (choice === "CPU") return ["CPU"];
+  if (choice === "GPU") return ["GPU"];
+  return ["GPU", "CPU"];          // "auto"
+}
+
+/** Shared shape for every tracker, so the rest of the code never branches. */
+function wrap(kind, numLandmarks, landmarker, delegate, adapt) {
+  let consecutiveErrors = 0;
+  return {
+    kind,
+    numLandmarks,
+    delegate,
+    errorCount: 0,
+    track(video, tMs) {
+      try {
+        const out = adapt(landmarker.detectForVideo(video, tMs));
+        consecutiveErrors = 0;
+        return out;
+      } catch (err) {
+        // A GPU context can be lost mid-session (the machine sleeps, the driver
+        // resets). Treat a hiccup as a frame with nothing detected rather than
+        // throwing away the participant's whole session, but do not hide a
+        // permanent failure.
+        this.errorCount++;
+        if (++consecutiveErrors > 90) {   // ~3 seconds of solid failure
+          throw new Error(
+            "Hand tracking stopped working partway through. This usually means " +
+            "the browser lost access to the graphics card. Please reload the " +
+            `page and start again. Details: ${err?.message || err}`
+          );
+        }
+        return { landmarks: [], worldLandmarks: [], handedness: [] };
+      }
+    },
+    close: () => landmarker.close(),
+  };
 }
 
 /* ---------------------------------------------------------------------------

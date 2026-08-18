@@ -1,4 +1,4 @@
-/* ui.js — small helpers for showing one screen at a time, counting down, and
+/* ui.js: small helpers for showing one screen at a time, counting down, and
  * telling the participant what is going on.
  *
  * The screens themselves live in index.html as <section class="screen"> blocks.

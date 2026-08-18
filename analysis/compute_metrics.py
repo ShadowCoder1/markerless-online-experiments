@@ -117,7 +117,7 @@ def _warn_about_bad_trials(rows: list[dict]) -> None:
         rate, fft = r.get("rate_hz"), r.get("fft_peak_hz")
         if rate and fft and abs(rate - fft) > 0.5 * max(rate, fft):
             problems.append(f"  {label}: counted {rate:.2f} Hz but the signal's own "
-                            f"frequency is {fft:.2f} Hz — check the detection settings")
+                            f"frequency is {fft:.2f} Hz, check the detection settings")
         if (r.get("n_taps") or 0) < 5:
             problems.append(f"  {label}: only {r.get('n_taps')} taps detected")
 

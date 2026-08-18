@@ -1,10 +1,10 @@
-/* recorder.js — collects one row of numbers per video frame, and splits the
+/* recorder.js: collects one row of numbers per video frame, and splits the
  * result into Firestore-sized pieces.
  *
  * WHY CHUNKING EXISTS
  * A Firestore document can hold at most 1 MiB. One frame of hand tracking is
  * about 1.2 KB (21 landmarks x 3 coordinates, twice: screen + world). A 30-
- * second trial at 30 fps is therefore ~1.1 MB — just over the limit. So we cut
+ * second trial at 30 fps is therefore about 1.1 MB, which is over the limit. So we cut
  * the frame list into chunks of RECORDING.chunkFrames and store each chunk as
  * its own document. analysis/fetch_data.py glues them back together, so you
  * never have to think about this again. */
@@ -45,7 +45,7 @@ export class Recorder {
   }
 
   /**
-   * Note that something happened at a point in time — a tap, a button press,
+   * Note that something happened at a point in time, a tap, a button press,
    * a target appearing. Events are stored in the small session document, so
    * they are cheap to query later.
    */

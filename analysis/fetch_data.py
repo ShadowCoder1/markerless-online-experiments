@@ -165,7 +165,7 @@ def main() -> None:
     print(f"\nDownloaded {downloaded}, already had {skipped}, "
           f"ignored {selftests} setup-check record(s).")
     if orphans:
-        print(f"\nNOTE: {len(orphans)} incomplete session(s) — these participants "
+        print(f"\nNOTE: {len(orphans)} incomplete session(s), these participants "
               f"started but did not finish, so only partial data exists:")
         for o in orphans[:10]:
             print(f"  {o}")

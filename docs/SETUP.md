@@ -1,10 +1,10 @@
 # Setup
 
-About 15 minutes, once. At the end you will have a working study you can send to
-participants.
+This takes about 15 minutes and you only do it once. At the end you will have a
+working study you can send to participants.
 
-Keep `check.html` open in a tab while you work through this — after each step,
-reload it and watch another line go green.
+Keep `check.html` open in a tab while you work through this. After each step,
+reload it to see which checks now pass.
 
 ---
 
@@ -16,33 +16,33 @@ cd markerless-online-experiments
 python3 -m http.server 8000
 ```
 
-Leave that running and open <http://localhost:8000/> — the experiment already
-works, in demo mode, without any of the steps below. Try it once to see what
-your participants will see. Nothing is saved until you finish this page.
+Leave that running and open <http://localhost:8000/>. The experiment already
+works in demo mode without any of the steps below, so you can try it once to see
+what your participants will see. Nothing is saved until you finish this page.
 
 Then open <http://localhost:8000/check.html>.
 
-> **Why a server?** Browsers refuse camera access to pages opened straight from
-> disk (a `file://` address). A local server makes the browser treat the page as
-> trustworthy. Any static server works; Python's is just the one you already have.
+> Browsers do not allow camera access on pages opened straight from disk (a
+> `file://` address). Running a local server avoids this. Any static server
+> works; Python's is used here because you already have it.
 
 ---
 
-## Step 1 — Create a Firebase project
+## Step 1. Create a Firebase project
 
 1. Go to <https://console.firebase.google.com/> and sign in with a Google account.
 2. **Create a project**. Name it after your study, e.g. `tapping-study`.
-3. Google Analytics is offered — you do not need it. Turn it off.
+3. Google Analytics is offered. You do not need it, so turn it off.
 
-Firebase's free Spark plan is enough for a typical study. As a rough guide, one
-15-second tapping trial is about 400 KB, so the free 1 GiB of storage holds
-somewhere around 2,000 trials.
+The free Spark plan is enough for a typical study. One 15-second tapping trial
+is roughly 400 KB, so the free 1 GiB of storage holds somewhere around 2,000
+trials.
 
-## Step 2 — Register a web app and copy the config
+## Step 2. Register a web app and copy the config
 
 1. On the project overview page, click the **web** icon (`</>`).
-2. Give it a nickname (anything). **Do not** tick Firebase Hosting — your study
-   is hosted on GitHub Pages.
+2. Give it a nickname. Do not tick Firebase Hosting, because your study is
+   hosted on GitHub Pages.
 3. Firebase shows you a `firebaseConfig` object. Copy the values into the
    `FIREBASE` block at the top of **`config.js`**.
 
@@ -57,21 +57,22 @@ export const FIREBASE = {
 };
 ```
 
-> **Is it safe to commit this to a public repo?** Yes. A Firebase web API key
-> identifies your project; it does not grant access to it. Access is controlled
-> by the rules you publish in step 4. This is
-> [Google's documented position](https://firebase.google.com/docs/projects/api-keys).
+> This is safe to commit to a public repository. A Firebase web API key
+> identifies your project but does not grant access to it. Access is controlled
+> by the rules you publish in step 4. See
+> [Google's documentation](https://firebase.google.com/docs/projects/api-keys).
 
-Reload `check.html` — *"config.js has been filled in"* should now be green.
+Reload `check.html`. The check named "config.js has been filled in" should now
+pass.
 
-## Step 3 — Turn on anonymous sign-in
+## Step 3. Turn on anonymous sign-in
 
 **Build → Authentication → Get started → Sign-in method → Anonymous → Enable.**
 
 This gives every participant a unique id without asking them to make an account,
 and it lets the security rules tell a real participant apart from a random bot.
 
-## Step 4 — Create the database and publish the rules
+## Step 4. Create the database and publish the rules
 
 1. **Build → Firestore Database → Create database.**
 2. Pick the location closest to your participants. **This cannot be changed
@@ -81,14 +82,14 @@ and it lets the security rules tell a real participant apart from a random bot.
 4. Open the **Rules** tab, delete what is there, and paste the entire contents of
    **`firestore.rules`** from this repository. Click **Publish**.
 
-> **Do not use test mode.** It lets anyone on the internet read and delete your
-> participants' data, and it stops working after 30 days — which, if you are
-> mid-study, means a week of silently failed uploads before you notice.
+> Do not use test mode. It allows anyone on the internet to read and delete your
+> participants' data, and it stops working after 30 days. If that happens partway
+> through a study, uploads fail silently and you may not notice for some time.
 
-Reload `check.html`. Everything should now be green. If it is not, the page tells
-you which step to revisit.
+Reload `check.html`. Every check should now pass. If one does not, the page says
+which step to go back to.
 
-## Step 5 — Run it on yourself
+## Step 5. Run it on yourself
 
 Open <http://localhost:8000/>. Do the whole thing once, start to finish. Then:
 
@@ -103,24 +104,24 @@ python analysis/visualize.py
 Open the figure in `data/figures/` and check that the marked taps line up with
 taps you actually made. **Do this before you recruit anyone.**
 
-> **No `gcloud`?** Install the
+> If you do not have `gcloud`, install the
 > [Google Cloud CLI](https://cloud.google.com/sdk/docs/install). If your
 > institution blocks that sign-in, create a service account key in the Firebase
 > console (Project settings → Service accounts) and point
 > `GOOGLE_APPLICATION_CREDENTIALS` at the downloaded file. Keep that file out of
-> git — the `.gitignore` already excludes `data/`, but a key belongs outside the
-> repository entirely.
+> git. The `.gitignore` already excludes `data/`, but a key file belongs outside
+> the repository entirely.
 
-## Step 6 — Going live with Prolific
+## Step 6. Going live with Prolific
 
 1. Push your copy to GitHub.
 2. **Settings → Pages → Source: Deploy from a branch → `main` / `/ (root)` → Save.**
 3. Wait a minute, then open `https://<your-username>.github.io/<your-repo>/` and
-   **run `check.html` again on that address.** A study that works on localhost
-   can still fail live, and this is where you find out.
+   run `check.html` again on that address. A study that works on localhost can
+   still fail once it is online, so it is worth checking there too.
 4. In Prolific, set the study URL to your Pages address. Prolific appends
    `?PROLIFIC_PID=…&STUDY_ID=…&SESSION_ID=…`, which the study reads
-   automatically — there is nothing to configure.
+   automatically, so there is nothing to configure.
 5. Copy your Prolific completion URL into `completionRedirectUrl` in `config.js`
    so participants are sent back and paid:
 
@@ -128,15 +129,16 @@ taps you actually made. **Do this before you recruit anyone.**
 completionRedirectUrl: "https://app.prolific.com/submissions/complete?cc=XXXXXXXX",
 ```
 
-6. **Pilot on yourself through the real Prolific link before opening recruitment.**
+6. Pilot the study on yourself through the real Prolific link before you open
+   recruitment.
 
 ---
 
-## A checklist before you recruit
+## Before you recruit
 
-- [ ] `check.html` is all green **on the public URL**, not just localhost
+- [ ] `check.html` passes on the public URL, not just on localhost
 - [ ] You have run the study on yourself and looked at the figure
 - [ ] The consent text in `config.js` matches what your IRB approved
 - [ ] `completionRedirectUrl` is set, and you have tested the redirect
-- [ ] The tap detector's marks line up with taps you actually made
+- [ ] The marked taps in the figure line up with taps you actually made
 - [ ] You have deleted your pilot sessions, or noted their IDs so you can exclude them

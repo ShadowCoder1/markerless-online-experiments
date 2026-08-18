@@ -1,78 +1,76 @@
 # Markerless online experiments
 
-Run hand- and body-movement experiments over the web. Participants open a link,
-their webcam is analysed **on their own computer**, and only the numeric joint
-positions come back to you. No app to install, no lab visit, no video uploaded.
+A starting point for running hand and body movement experiments over the web.
+Participants open a link, their webcam is analysed on their own computer, and
+only the numeric positions of their joints are sent back to you. No video is
+uploaded, and there is nothing for them to install.
 
-Built on [MediaPipe](https://ai.google.dev/edge/mediapipe) for tracking and
-[Firebase](https://firebase.google.com/) for storage. There is no build step and
-no `npm install` — you edit a file and refresh the page.
+Tracking uses [MediaPipe](https://ai.google.dev/edge/mediapipe). Data is stored
+in [Firebase](https://firebase.google.com/). Analysis is in Python. There is no
+build step: you edit a file and reload the page.
 
-A complete **finger-tapping** experiment is included and ready to run:
-**[try it live](https://shadowcoder1.github.io/markerless-online-experiments/)**
-— it works right now, in your browser, with no accounts and no setup.
+A finger-tapping experiment is included and works as-is. You can
+[try it here](https://shadowcoder1.github.io/markerless-online-experiments/).
 
-Until you connect a Firebase project it runs in **demo mode**: the task works
-normally and you see your tap count live, but nothing is uploaded. You can
-download your own session as JSON at the end and run the Python analysis on it.
+Until you connect a Firebase project, the site runs in demo mode. The task works
+and you see your tap count as you go, but nothing is uploaded. You can download
+your own session at the end and run the analysis scripts on it.
 
----
+## Contents
 
-## What you get
+```
+index.html              the page participants see
+check.html              tests your setup and reports what is wrong
+config.js               the file you edit
+firestore.rules         paste into the Firebase console (SETUP.md step 4)
 
-| | |
-|---|---|
-| **A working experiment** | Finger tapping, with a live tap counter, two hands, and per-trial summary numbers |
-| **Runs before you set anything up** | No Firebase yet? It still runs, shows your count, and hands you your data as JSON |
-| **A template** | `experiments/_template.js` — five commented hooks, and you have your own task |
-| **A setup checker** | `check.html` runs every part of the pipeline and tells you exactly what is broken |
-| **Real security rules** | Participants can only ever add data. Nobody can read or delete it through the website |
-| **Analysis in Python** | Download → metrics table → figures, in three commands |
-| **Example data** | Try the whole analysis pipeline before you recruit anyone |
+js/core/                camera, tracker, recorder, uploads, screen flow
+experiments/            one file per experiment, plus _template.js
+analysis/               fetch, compute metrics, draw figures
+docs/                   setup, customisation, troubleshooting, data format
+```
 
----
+## Trying the analysis without collecting data
 
-## Try it in two minutes, with no accounts and no setup
-
-You can see the analysis half working right now:
+The analysis scripts work on invented data, so you can see what comes out before
+setting anything up.
 
 ```bash
 git clone https://github.com/ShadowCoder1/markerless-online-experiments.git
 cd markerless-online-experiments
 pip install -r analysis/requirements.txt
 
-python analysis/make_example_data.py                                  # invent 3 participants
-python analysis/compute_metrics.py --raw data/example                 # -> a metrics table
-python analysis/visualize.py --raw data/example --out data/example_figures   # -> figures
+python analysis/make_example_data.py
+python analysis/compute_metrics.py --raw data/example
+python analysis/visualize.py --raw data/example --out data/example_figures
 ```
 
-Open `data/example_figures/` and look at the pictures. Every tap the software
-found is marked, so you can check its work by eye.
+Then open `data/example_figures/`. Each figure marks every tap the software
+found, so you can check whether it agrees with what you see in the trace.
 
----
-
-## Run the actual experiment
+## Running the experiment
 
 ### 1. Serve the folder
 
-Browsers block webcam access for pages opened directly from disk, so run a tiny
+Browsers do not allow webcam access on pages opened directly from disk, so run a
 local server:
 
 ```bash
 python3 -m http.server 8000
 ```
 
-Then open **<http://localhost:8000/check.html>**. Some checks will fail until you
-have done step 2 — that is expected and the page will tell you so.
+Open <http://localhost:8000/>. The task runs in demo mode straight away. Open
+<http://localhost:8000/check.html> to test your setup; some checks will fail
+until you have done step 2.
 
 ### 2. Connect Firebase
 
-Follow **[docs/SETUP.md](docs/SETUP.md)**. It takes about 15 minutes and you only
-do it once. When you are done, `check.html` should be all green.
+Follow [docs/SETUP.md](docs/SETUP.md). It takes about 15 minutes and you do it
+once. When you are finished, every check on `check.html` should pass.
 
 ### 3. Collect data
 
-Open **<http://localhost:8000/>** and do the experiment on yourself. Then:
+Run the study on yourself, then:
 
 ```bash
 gcloud auth application-default login     # once per computer
@@ -83,88 +81,66 @@ python analysis/visualize.py
 
 ### 4. Put it online
 
-Push your copy to GitHub, then **Settings → Pages → Source: Deploy from a
-branch → `main` / root**. A minute later your study is live at
-`https://<your-username>.github.io/<your-repo>/`.
+Push your copy to GitHub, then go to Settings, Pages, and set the source to
+"Deploy from a branch" with `main` and `/ (root)`. Your study will be at
+`https://<your-username>.github.io/<your-repo>/` about a minute later.
 
-That URL is what you paste into Prolific. Prolific's identifiers are picked up
-from the link automatically — see [docs/SETUP.md](docs/SETUP.md#step-6--going-live-with-prolific).
+That address is what you give to Prolific. Prolific's identifiers are read from
+the URL automatically, so there is nothing to configure. See
+[docs/SETUP.md](docs/SETUP.md#step-6--going-live-with-prolific).
 
----
-
-## Making it your own experiment
+## Writing your own experiment
 
 ```bash
 cp experiments/_template.js experiments/my-task.js
 ```
 
-Change `id` to `"my-task"`, set `ACTIVE_EXPERIMENT: "my-task"` in `config.js`,
-and reload. There are five hooks and they happen in the order you would guess:
+Set `id` to `"my-task"`, set `ACTIVE_EXPERIMENT: "my-task"` in `config.js`, and
+reload. There are four hooks, called in this order:
 
 ```js
-onTrialStart(trial)     // set up whatever you need to count
-onFrame({ ... })        // runs once per camera frame — do your measuring here
+onTrialStart(trial)     // set up whatever you need to keep track of
+onFrame({ ... })        // runs once per camera frame, do your measuring here
 draw(ctx, { ... })      // paint the overlay the participant sees
-onTrialEnd({ ... })     // return the summary numbers for this trial
+onTrialEnd({ ... })     // return the summary numbers for the trial
 ```
 
-Switching from hands to the whole body is one line: `tracker: "pose"`.
+To track the whole body instead of a hand, set `tracker: "pose"`.
 
-[docs/CUSTOMIZE.md](docs/CUSTOMIZE.md) is a list of "I want to change X" with the
-lines to change.
+[docs/CUSTOMIZE.md](docs/CUSTOMIZE.md) lists common changes and the lines to
+change for each.
 
----
-
-## How your data is stored
+## How the data is stored
 
 ```
-sessions/{sessionId}                      one small document: who, when, and the
-                                          per-trial summary numbers
+sessions/{sessionId}                      one small document per session: who,
+                                          when, and the per-trial summaries
 sessions/{sessionId}/chunks/{trial}_{n}   the raw frame-by-frame landmarks
 ```
 
 The raw landmarks are split across several documents because a Firestore
-document tops out at 1 MiB. `fetch_data.py` glues them back together, so you
-never deal with it. Full description in
-[docs/DATA_FORMAT.md](docs/DATA_FORMAT.md).
+document cannot exceed 1 MiB. `fetch_data.py` puts them back together, so this
+does not affect how you work with the data.
+[docs/DATA_FORMAT.md](docs/DATA_FORMAT.md) describes every field.
 
-**Tap detection runs twice, deliberately.** The browser detects taps live so the
-participant sees a counter. `analysis/metrics.py` re-derives every tap from the
-raw landmarks, and that is the version you should report. It means you can
-change your mind about detection thresholds *after* collecting data, without
-recollecting.
-
----
+Taps are detected twice. The browser detects them during the session so the
+participant can see a count, and `analysis/metrics.py` detects them again from
+the raw landmarks afterwards. The second one is the one to report, and it means
+you can change the detection settings after collecting data rather than before.
 
 ## Privacy
 
-No image or video ever leaves the participant's computer. MediaPipe runs
-locally in their browser; what gets uploaded is a list of joint coordinates.
-The consent text in `config.js` says exactly this — edit it to match what your
-IRB approved.
+No image or video leaves the participant's computer. MediaPipe runs in their
+browser and only joint coordinates are uploaded. The consent text in `config.js`
+says this. Edit it to match what your ethics board approved.
 
----
+## If something is not working
 
-## Repository layout
-
-```
-index.html              the experiment participants see
-check.html              setup checker — run this whenever something is wrong
-config.js               the only file you have to edit
-firestore.rules         paste into the Firebase console (docs/SETUP.md step 4)
-
-js/core/                camera, tracker, recorder, firebase, screens
-experiments/            one file per experiment  (+ _template.js)
-analysis/               fetch → metrics → figures, in Python
-docs/                   SETUP, CUSTOMIZE, TROUBLESHOOTING, DATA_FORMAT
-```
-
-## Getting help
-
-Something not working? Start with `check.html`, then
-[docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md), which is organised by the
-exact error message you are seeing.
+Open `check.html` first. It tests the camera, the model, your Firebase settings,
+sign-in, and a test write, and reports which step failed and what to do about
+it. [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) is organised by the error
+message you are seeing.
 
 ## Licence
 
-MIT — use it, change it, publish with it.
+MIT. See [LICENSE](LICENSE).

@@ -1,12 +1,11 @@
-/* camera.js — turns on the webcam and hands back a playing <video> element.
+/* camera.js: turns on the webcam and hands back a playing <video> element.
  *
  * You almost never need to edit this file. */
 
 /**
  * Ask the browser for camera access and start streaming into a <video>.
  *
- * @param {{width:number, height:number}} size  requested resolution (a hint —
- *        the browser may give you something close but not exact)
+ * @param {{width:number, height:number}} size  requested resolution (a hint, *        the browser may give you something close but not exact)
  * @returns {Promise<HTMLVideoElement>} a video element that is already playing
  * @throws {Error} with a human-readable .message explaining what to tell the
  *         participant (denied permission, no camera, camera already in use...)
@@ -15,7 +14,7 @@ export async function startCamera(size = { width: 640, height: 480 }) {
   if (!window.isSecureContext) {
     throw new Error(
       "Browsers only allow camera access over HTTPS. Open this page through " +
-      "https://... or http://localhost — not as a file:// path."
+      "https://... or http://localhost, not as a file:// path."
     );
   }
   if (!navigator.mediaDevices?.getUserMedia) {

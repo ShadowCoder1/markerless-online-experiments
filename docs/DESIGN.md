@@ -45,7 +45,7 @@ and `fetch_data.py` reports them separately rather than mixing partial sessions
 into the dataset.
 
 **Create-only security rules, with anonymous auth.** Participants can add their
-own data and can do nothing else — no reads, no updates, no deletes. Analysis
+own data and can do nothing else: no reads, no updates, no deletes. Analysis
 authenticates as the project owner and bypasses rules entirely. Firebase's "test
 mode" was rejected twice over: it exposes every participant's data to the
 internet, and it silently expires after 30 days, which for a running study means
@@ -82,8 +82,19 @@ All three are now handled: intervals spanning a gap are dropped, the rate
 denominator is `analysed_sec`, and a closure must have valid data on both sides
 (`edge_guard_seconds`) to be believed. After the fix the dropout trial's metrics
 are within 1.5% of the clean ones. In a patient study the original behaviour
-would have read as a clinical finding rather than a camera problem — which is
-the kind of bug worth a paragraph.
+would have read as a clinical finding rather than a camera problem, which is why
+it is written up here.
+
+**Tracking falls back from the graphics card to the CPU.** MediaPipe's GPU path
+needs a WebGL context, and a fair number of real machines cannot provide one:
+hardware acceleration switched off, a blocklisted driver, a virtual machine, a
+remote desktop, or too many WebGL contexts already open. Those participants used
+to see `emscripten_webgl_create_context() returned error 0` and could not take
+part at all. The CPU path is slower but works everywhere, which matters more for
+a study people join from their own computers. Measured on this machine, GPU
+inference takes about 9 ms per frame and CPU about 19 ms, so CPU still runs
+faster than the camera delivers frames. Which one was used is stored with the
+session as `environment.trackerDelegate`.
 
 **Text lives in HTML, not on the canvas.** The video and its overlay are
 mirrored with a CSS transform so participants see themselves the right way
@@ -105,8 +116,8 @@ into a DOM element positioned over the video, and experiments receive a
   through the real browser recorder, chunked, reassembled, and analysed: 3.93
   and 4.00 Hz out.
 
-`make_example_data.py` ships partly because it was the test harness — it lets
-anyone re-run these checks, and lets a new user exercise the analysis before
+`make_example_data.py` is included partly because it was the test harness. It
+lets anyone re-run these checks, and lets a new user try the analysis before
 recruiting a single participant.
 
 ## Deliberately not included

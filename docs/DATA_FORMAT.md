@@ -7,8 +7,9 @@ sessions/{sessionId}                      small: who, when, per-trial summaries
 sessions/{sessionId}/chunks/{trial}_{n}   large: the raw landmarks
 ```
 
-`sessionId` looks like `20260118T143052_a7f3k2` — the time it started, plus a
-few random characters, so it sorts chronologically and never collides.
+A `sessionId` looks like `20260118T143052_a7f3k2`. It is the time the session
+started plus a few random characters, so ids sort chronologically and do not
+collide.
 
 ### The session document
 
@@ -34,7 +35,7 @@ Written **once, at the very end** of a session.
       "frameCount": 448,
       "detectionRate": 0.982,
       "events": [ { "t": 412.3, "type": "tap", "aperture": 0.19 } ],
-      "tapCount": 61                  // live estimate — see the warning below
+      "tapCount": 61                  // live estimate, see the note below
     }
   ],
   "settings": { … },             // the config in force, so you can tell later
@@ -78,12 +79,13 @@ around 300 KB. `fetch_data.py` reassembles them, so this never reaches you.
 }
 ```
 
-- `lm` — **image coordinates.** `x` and `y` run 0–1 across the frame. Use these
-  for drawing. Because `x` is scaled by width and `y` by height, distances
-  measured in these units are distorted whenever the video is not square.
-- `wl` — **world coordinates,** in metres, with the origin at the middle of the
-  hand. These are what to measure with: they do not change when the participant
-  leans towards the camera.
+- `lm` holds image coordinates. `x` and `y` run from 0 to 1 across the frame.
+  Use these for drawing. Because `x` is scaled by the width and `y` by the
+  height, distances measured in these units are distorted whenever the video is
+  not square.
+- `wl` holds world coordinates, in metres, with the origin at the middle of the
+  hand. Use these for measurement. They do not change when the participant leans
+  towards the camera.
 - `lm` and `wl` are **`null`** on frames where nothing was detected. They are
   kept rather than dropped, so gaps in tracking stay visible in your data
   instead of quietly closing up.
@@ -119,7 +121,7 @@ data/processed/settings.json       the detection settings used
 |---|---|
 | `n_taps` | taps detected |
 | `rate_hz` | taps per second **of analysed time** |
-| `fft_peak_hz` | dominant frequency of the signal, found without peak detection — an independent check on `rate_hz` |
+| `fft_peak_hz` | dominant frequency of the signal, found without peak detection, so it is an independent check on `rate_hz` |
 | `iti_mean_ms`, `iti_sd_ms`, `iti_cv` | inter-tap intervals: speed and rhythm variability |
 | `amplitude_mean/sd/cv` | how wide the fingers opened |
 | `amplitude_slope` | change in amplitude per tap. Negative = shrinking (the sequence effect / decrement) |
@@ -136,5 +138,6 @@ data/processed/settings.json       the detection settings used
 `analysed_sec` rather than trial length, intervals spanning a gap are dropped
 from the rhythm statistics, and a peak at the truncated edge of a gap is not
 counted as a tap. Without this, three seconds of lost tracking shows up as a
-movement halt and inflates rhythm variability by a factor of twenty — which,
-in a patient study, reads as a clinical finding rather than a camera problem.
+movement halt and inflates rhythm variability by a factor of twenty. In a
+patient study that would read as a clinical finding rather than a camera
+problem.

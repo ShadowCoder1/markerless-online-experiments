@@ -9,8 +9,7 @@ rules_version = '2';
  *
  *  WHAT THESE RULES DO
  *    - Participants may CREATE their own session and its data chunks.
- *    - Nobody using the website can READ, EDIT, or DELETE anything, ever —
- *      including their own data, and including you.
+ *    - Nobody using the website can READ, EDIT, or DELETE anything, ever, *      including their own data, and including you.
  *    - You read the data with analysis/fetch_data.py, which authenticates as
  *      you (a project owner) and bypasses these rules entirely.
  *

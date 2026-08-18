@@ -28,10 +28,17 @@
   <!-- Shown only when config.js has no Firebase settings, so it is obvious that
        the task is running but nothing is being recorded. -->
   <div id="demo-banner" class="banner" hidden>
-    <strong>Demo mode.</strong> Firebase is not set up, so <strong>nothing is
-    being saved</strong> — the task still runs and you can see the tracking work.
-    To collect real data, fill in <code>config.js</code>
+    <strong>Demo mode.</strong> Firebase is not set up, so <strong>nothing is being
+    saved</strong>. The task still runs and you can see the tracking working. To
+    collect real data, fill in <code>config.js</code>
     (<a href="docs/SETUP.md">setup instructions</a>).
+  </div>
+
+  <!-- Shown when MediaPipe could not get a GPU context and fell back to the
+       CPU. Not an error: the task works, just at a lower frame rate. -->
+  <div id="cpu-banner" class="banner subtle-banner" hidden>
+    Your computer could not use its graphics card for tracking, so this is
+    running on the CPU. It still works, but it may feel a little slower.
   </div>
 
   <!-- 1 ------------------------------------------------------------------ -->
@@ -46,7 +53,7 @@
       <input id="manual-id-input" type="text" autocomplete="off" placeholder="e.g. P01">
     </div>
 
-    <button id="btn-consent" class="primary">I agree — begin</button>
+    <button id="btn-consent" class="primary">I agree, begin</button>
   </section>
 
   <!-- 2 ------------------------------------------------------------------ -->
@@ -68,7 +75,7 @@
       <ul>
         <li>Make sure the room is reasonably bright, and that the light is in
             front of you rather than behind you.</li>
-        <li>Hold your hand about 40–60&nbsp;cm from the camera.</li>
+        <li>Hold your hand about 40 to 60&nbsp;cm from the camera.</li>
         <li>Plain background helps. Move away from busy patterns.</li>
       </ul>
     </details>
@@ -78,7 +85,7 @@
   <section id="screen-instructions" class="screen">
     <h2>Instructions</h2>
     <div id="instructions-text" class="prose"></div>
-    <button id="btn-start" class="primary">I'm ready — start</button>
+    <button id="btn-start" class="primary">I'm ready, start</button>
   </section>
 
   <!-- 5 ------------------------------------------------------------------ -->
@@ -108,7 +115,7 @@
 
   <!-- 8 ------------------------------------------------------------------ -->
   <section id="screen-done" class="screen">
-    <h2>All done — thank you!</h2>
+    <h2>All done. Thank you!</h2>
 
     <div id="done-results"></div>
 
@@ -116,8 +123,8 @@
        <span class="subtle">Session ID: <code id="done-session-id"></code></span></p>
 
     <div id="done-demo" hidden>
-      <p><strong>Nothing was saved</strong> — this is a demo, and no Firebase
-         project is connected.</p>
+      <p><strong>Nothing was saved.</strong> This is a demo and no Firebase project is
+         connected.</p>
       <button id="btn-download-demo" class="primary">Download my data as JSON</button>
       <p class="subtle">The file matches what <code>analysis/fetch_data.py</code>
          produces, so you can drop it into <code>data/raw/</code> and run

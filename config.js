@@ -1,20 +1,20 @@
 /* =============================================================================
- *  config.js  —  THE ONLY FILE YOU NEED TO EDIT TO GET STARTED
+ *  config.js, THE ONLY FILE YOU NEED TO EDIT TO GET STARTED
  * =============================================================================
  *
- *  1. Fill in FIREBASE below (see docs/SETUP.md — takes about 15 minutes).
+ *  1. Fill in FIREBASE below (see docs/SETUP.md, takes about 15 minutes).
  *  2. Open check.html to confirm everything works.
  *  3. Open index.html to run the experiment.
  *
  *  Everything in this file is safe to commit to a public repo. Firebase web
- *  API keys are public identifiers, NOT secrets — your data is protected by
+ *  API keys are public identifiers, NOT secrets, your data is protected by
  *  firestore.rules, not by hiding this key. (This surprises people. It is
  *  documented by Google: https://firebase.google.com/docs/projects/api-keys)
  * ===========================================================================*/
 
 
 /* -----------------------------------------------------------------------------
- * 1. FIREBASE  —  where your participants' data gets saved
+ * 1. FIREBASE, where your participants' data gets saved
  * ---------------------------------------------------------------------------
  * Paste the config object from the Firebase Console here.
  * Firebase Console -> Project settings -> Your apps -> Web app -> Config
@@ -52,10 +52,10 @@ export const STUDY = {
   consentHtml: `
     <p>In this study you will be asked to perform simple hand movements in
     front of your webcam.</p>
-    <p><strong>What we record:</strong> we do <em>not</em> record or upload any
+    <p><strong>What we record.</strong> We do <em>not</em> record or upload any
     video or images. Your webcam feed is processed entirely on your own
-    computer. Only the numeric positions of your hand joints (x, y, z
-    coordinates) are sent to our secure server.</p>
+    computer. Only the numeric positions of your hand joints (x, y and z
+    coordinates) are sent to our server.</p>
     <p>Participation is voluntary and you may stop at any time by closing this
     page.</p>`,
 
@@ -70,7 +70,7 @@ export const STUDY = {
 
 
 /* -----------------------------------------------------------------------------
- * 4. RECORDING SETTINGS  —  most people never need to change these
+ * 4. RECORDING SETTINGS, most people never need to change these
  * ---------------------------------------------------------------------------*/
 export const RECORDING = {
   // Target camera resolution. Lower = faster on weak laptops.
@@ -78,7 +78,7 @@ export const RECORDING = {
 
   // How many frames go into one Firestore document.
   // WHY THIS EXISTS: a Firestore document can hold at most 1 MiB. One frame of
-  // hand data is roughly 1.2 KB, so 250 frames is about 300 KB — a safe margin.
+  // hand data is roughly 1.2 KB, so 250 frames is about 300 KB, a safe margin.
   // If you record many more landmarks per frame, lower this number.
   chunkFrames: 250,
 
@@ -95,7 +95,7 @@ export const RECORDING = {
 
 
 /* -----------------------------------------------------------------------------
- * 5. MEDIAPIPE VERSIONS  —  pinned on purpose
+ * 5. MEDIAPIPE VERSIONS, pinned on purpose
  * ---------------------------------------------------------------------------
  * Pinned so that your study does not silently change halfway through data
  * collection because Google shipped a new model. Only bump these between
@@ -103,6 +103,13 @@ export const RECORDING = {
  * ---------------------------------------------------------------------------*/
 export const MEDIAPIPE = {
   version: "1.0.1",
+
+  // "auto" tries the graphics card and falls back to the CPU if that fails,
+  // which is what you want almost always. Force "CPU" if a participant's
+  // machine is unstable on the GPU, or "GPU" to refuse to run without it.
+  // A URL can override this for one participant:  index.html?delegate=cpu
+  delegate: "auto",
+
   models: {
     hand: "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task",
     pose: "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task",
