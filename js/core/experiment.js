@@ -45,6 +45,16 @@ async function run(exp) {
   const participant = getParticipant();
   const startedAt = new Date().toISOString();
 
+  // Flag demo mode up front, before the consent screen: someone should know
+  // that nothing is being recorded *before* they agree to anything.
+  if (fb.configLooksUnfilled()) {
+    ui.$("#demo-banner").hidden = false;
+    console.warn(
+      "Demo mode: Firebase is not configured, so nothing will be saved. " +
+      "Fill in FIREBASE in config.js to collect data (see docs/SETUP.md)."
+    );
+  }
+
   /* ---- 1. Welcome + consent ------------------------------------------- */
   ui.setText("#study-title", STUDY.title);
   ui.setText("#study-lab", STUDY.labName);
@@ -63,10 +73,12 @@ async function run(exp) {
     participant.participantId = typed || `anon_${Math.random().toString(36).slice(2, 8)}`;
   }
 
-  /* ---- 2. Firebase ----------------------------------------------------- */
+  /* ---- 2. Firebase (optional) ------------------------------------------ */
+  // If config.js has not been filled in, the study still runs — it just does
+  // not save. That keeps the live demo usable by anyone who clicks the link.
   ui.showScreen("screen-loading");
   ui.setText("#loading-text", "Connecting…");
-  await fb.initFirebase();
+  const { enabled: saving } = await fb.initFirebase();
   const sessionId = fb.newSessionId();
 
   /* ---- 3. Camera + tracker --------------------------------------------- */
@@ -99,6 +111,7 @@ async function run(exp) {
   const trials = typeof exp.trials === "function" ? exp.trials() : exp.trials;
   const recorder = new Recorder();
   const trialSummaries = [];
+  const demoFrames = [];    // only used when nothing is being uploaded
 
   for (let i = 0; i < trials.length; i++) {
     const trial = trials[i];
@@ -128,14 +141,21 @@ async function run(exp) {
       ...summary,
     });
 
-    /* Upload straight away, so someone who quits mid-study still leaves data. */
-    ui.showScreen("screen-saving");
-    const chunks = recorder.toChunks();
-    await fb.uploadTrialChunks(
-      sessionId, i, chunks,
-      { experimentId: exp.id, trialId: trial.id ?? `trial_${i}` },
-      (done, total) => ui.setText("#saving-text", `Saving… ${done}/${total}`)
-    );
+    if (saving) {
+      /* Upload straight away, so someone who quits mid-study still leaves data. */
+      ui.showScreen("screen-saving");
+      const chunks = recorder.toChunks();
+      await fb.uploadTrialChunks(
+        sessionId, i, chunks,
+        { experimentId: exp.id, trialId: trial.id ?? `trial_${i}` },
+        (done, total) => ui.setText("#saving-text", `Saving… ${done}/${total}`)
+      );
+    } else {
+      // Nowhere to upload to, so hold onto the frames and offer them as a
+      // download at the end. The file matches what fetch_data.py produces, so
+      // it can go straight into the Python analysis.
+      demoFrames[i] = recorder.frames.slice();
+    }
 
     if (i < trials.length - 1) {
       ui.showScreen("screen-rest");
@@ -145,8 +165,10 @@ async function run(exp) {
   }
 
   /* ---- 7. Session summary ----------------------------------------------- */
-  ui.showScreen("screen-saving");
-  ui.setText("#saving-text", "Saving your results…");
+  if (saving) {
+    ui.showScreen("screen-saving");
+    ui.setText("#saving-text", "Saving your results…");
+  }
 
   const sessionDoc = {
     experimentId: exp.id,
@@ -163,7 +185,7 @@ async function run(exp) {
   };
   await fb.saveSession(sessionId, sessionDoc);
 
-  if (RECORDING.alsoDownloadLocally) {
+  if (saving && RECORDING.alsoDownloadLocally) {
     ui.downloadJson(`${sessionId}.json`, sessionDoc);
   }
 
@@ -172,10 +194,23 @@ async function run(exp) {
   tracker.close();
   stage.hidden = true;
 
-  ui.setText("#done-session-id", sessionId);
+  // Show people what they just did. In demo mode this IS the point of the page.
+  ui.setHtml("#done-results", resultsTable(exp, trialSummaries));
+
+  if (saving) {
+    ui.setText("#done-session-id", sessionId);
+  } else {
+    ui.$("#done-saved-line").hidden = true;
+    ui.$("#done-demo").hidden = false;
+    ui.$("#btn-download-demo").onclick = () => {
+      const copy = structuredClone(sessionDoc);
+      copy.trials.forEach((t, i) => { t.frames = demoFrames[i] ?? []; });
+      ui.downloadJson(`${sessionId}.json`, copy);
+    };
+  }
   ui.showScreen("screen-done");
 
-  if (STUDY.completionRedirectUrl) {
+  if (saving && STUDY.completionRedirectUrl) {
     ui.setText("#done-redirect-note", "Returning you to Prolific in 5 seconds…");
     await ui.sleep(5000);
     location.href = STUDY.completionRedirectUrl;
@@ -302,6 +337,29 @@ export function drawLandmarks(ctx, canvas, landmarks, colour = "#4ade80") {
     ctx.arc(p.x * W, p.y * H, 4, 0, Math.PI * 2);
     ctx.fill();
   }
+}
+
+/** A small table of what happened, shown on the final screen. */
+function resultsTable(exp, summaries) {
+  const rows = summaries.map((t) => {
+    const bits = [];
+    if (t.tapCount != null) bits.push(`<td>${t.tapCount}</td>`);
+    if (t.tapRateHz != null) bits.push(`<td>${t.tapRateHz.toFixed(2)} Hz</td>`);
+    if (t.detectionRate != null) {
+      const pct = Math.round(t.detectionRate * 100);
+      bits.push(`<td class="${pct < 90 ? "bad" : ""}">${pct}%</td>`);
+    }
+    return `<tr><th>${t.hand ?? t.id}</th>${bits.join("")}</tr>`;
+  });
+  if (!rows.length) return "";
+  const headers = ["", summaries[0].tapCount != null ? "taps" : null,
+                   summaries[0].tapRateHz != null ? "rate" : null,
+                   summaries[0].detectionRate != null ? "hand visible" : null]
+                  .filter((h) => h !== null);
+  return `<table class="results">
+    <tr>${headers.map((h) => `<th>${h}</th>`).join("")}</tr>
+    ${rows.join("")}
+  </table>`;
 }
 
 function nextFrame() {

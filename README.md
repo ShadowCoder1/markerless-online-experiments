@@ -10,8 +10,11 @@ no `npm install` — you edit a file and refresh the page.
 
 A complete **finger-tapping** experiment is included and ready to run:
 **[try it live](https://shadowcoder1.github.io/markerless-online-experiments/)**
-(it will ask for your camera, then stop at the Firebase step — that part is
-yours to set up).
+— it works right now, in your browser, with no accounts and no setup.
+
+Until you connect a Firebase project it runs in **demo mode**: the task works
+normally and you see your tap count live, but nothing is uploaded. You can
+download your own session as JSON at the end and run the Python analysis on it.
 
 ---
 
@@ -19,7 +22,8 @@ yours to set up).
 
 | | |
 |---|---|
-| **A working experiment** | Finger tapping, with live feedback, two hands, and per-trial summary numbers |
+| **A working experiment** | Finger tapping, with a live tap counter, two hands, and per-trial summary numbers |
+| **Runs before you set anything up** | No Firebase yet? It still runs, shows your count, and hands you your data as JSON |
 | **A template** | `experiments/_template.js` — five commented hooks, and you have your own task |
 | **A setup checker** | `check.html` runs every part of the pipeline and tells you exactly what is broken |
 | **Real security rules** | Participants can only ever add data. Nobody can read or delete it through the website |

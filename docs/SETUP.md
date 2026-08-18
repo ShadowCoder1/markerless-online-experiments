@@ -16,7 +16,11 @@ cd markerless-online-experiments
 python3 -m http.server 8000
 ```
 
-Leave that running and open <http://localhost:8000/check.html>.
+Leave that running and open <http://localhost:8000/> — the experiment already
+works, in demo mode, without any of the steps below. Try it once to see what
+your participants will see. Nothing is saved until you finish this page.
+
+Then open <http://localhost:8000/check.html>.
 
 > **Why a server?** Browsers refuse camera access to pages opened straight from
 > disk (a `file://` address). A local server makes the browser treat the page as

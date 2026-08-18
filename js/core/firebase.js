@@ -24,6 +24,10 @@ const SDK = "https://www.gstatic.com/firebasejs/12.17.1";
 
 let app = null, db = null, auth = null, uid = null;
 
+// False when config.js has not been filled in. The experiment still runs — it
+// just does not save anything. See initFirebase().
+let enabled = false;
+
 /** True if config.js still has the placeholder values in it. */
 export function configLooksUnfilled() {
   return Object.values(FIREBASE).some(
@@ -33,18 +37,24 @@ export function configLooksUnfilled() {
 
 /**
  * Start Firebase and sign in anonymously.
- * Anonymous sign-in gives every participant a unique id without asking them
- * for an account, and lets the security rules reject writes from bots.
- * @returns {Promise<{uid:string}>}
+ *
+ * If config.js has not been filled in, this does NOT fail. It returns
+ * `{ enabled: false }` and the experiment runs in demo mode: the task works
+ * normally and the participant sees their live tap count, but nothing is
+ * uploaded. That way the study is something you can click and try before you
+ * have set up any accounts.
+ *
+ * Anonymous sign-in gives every participant a unique id without asking them for
+ * an account, and lets the security rules reject writes from bots.
+ *
+ * @returns {Promise<{uid: string|null, enabled: boolean}>}
  */
 export async function initFirebase() {
-  if (uid) return { uid };
+  if (uid) return { uid, enabled: true };
 
   if (configLooksUnfilled()) {
-    throw new Error(
-      "Firebase is not configured yet. Open config.js and paste your project's " +
-      "settings into FIREBASE. Step-by-step instructions are in docs/SETUP.md."
-    );
+    enabled = false;
+    return { uid: null, enabled: false };
   }
 
   const { initializeApp } = await import(`${SDK}/firebase-app.js`);
@@ -58,6 +68,7 @@ export async function initFirebase() {
   try {
     const cred = await signInAnonymously(auth);
     uid = cred.user.uid;
+    enabled = true;
   } catch (err) {
     if (String(err?.code).includes("operation-not-allowed")) {
       throw new Error(
@@ -69,8 +80,11 @@ export async function initFirebase() {
     throw new Error(`Could not sign in to Firebase: ${err?.message || err}`);
   }
 
-  return { uid };
+  return { uid, enabled: true };
 }
+
+/** Is data actually being saved? False in demo mode. */
+export function isEnabled() { return enabled; }
 
 /** A readable, sortable, collision-proof session id. */
 export function newSessionId() {
@@ -92,6 +106,7 @@ export function newSessionId() {
  * @param {(done:number,total:number)=>void} [onProgress]
  */
 export async function uploadTrialChunks(sessionId, trialIndex, chunks, meta, onProgress) {
+  if (!enabled) return;          // demo mode: nothing is saved
   const { doc, setDoc, serverTimestamp } = await import(`${SDK}/firebase-firestore.js`);
 
   for (let i = 0; i < chunks.length; i++) {
@@ -117,6 +132,7 @@ export async function uploadTrialChunks(sessionId, trialIndex, chunks, meta, onP
  * @param {object} payload  everything except uid/timestamps, which we add here
  */
 export async function saveSession(sessionId, payload) {
+  if (!enabled) return;          // demo mode: nothing is saved
   const { doc, setDoc, serverTimestamp } = await import(`${SDK}/firebase-firestore.js`);
   await setDoc(doc(db, "sessions", sessionId), {
     ...payload,

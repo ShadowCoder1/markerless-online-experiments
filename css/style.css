@@ -155,3 +155,41 @@ button.primary:disabled { background: #333a47; color: #777f8c; cursor: not-allow
 .check .name { font-weight: 600; }
 .check .detail { color: var(--subtle); font-size: .9rem; margin-top: 4px; white-space: pre-wrap; }
 .check .detail a { color: var(--accent); }
+
+/* ---- demo-mode banner -------------------------------------------------- */
+.banner {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 12px 18px;
+  background: #3a2f12;
+  border-bottom: 2px solid #f0ad4e;
+  color: #ffe9c2;
+  font-size: .92rem;
+  line-height: 1.5;
+}
+.banner a { color: #ffd08a; }
+.banner code { background: rgba(0,0,0,.4); }
+
+/* ---- results table on the final screen --------------------------------- */
+table.results {
+  width: 100%;
+  margin: 18px 0 8px;
+  border-collapse: collapse;
+  background: var(--panel);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+table.results th, table.results td {
+  padding: 10px 14px;
+  text-align: left;
+  border-bottom: 1px solid #232833;
+}
+table.results tr:first-child th {
+  font-size: .78rem;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--subtle);
+  font-weight: 600;
+}
+table.results tr:last-child th, table.results tr:last-child td { border-bottom: 0; }
+table.results td { font-variant-numeric: tabular-nums; }

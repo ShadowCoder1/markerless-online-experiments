@@ -25,6 +25,15 @@
 
 <main>
 
+  <!-- Shown only when config.js has no Firebase settings, so it is obvious that
+       the task is running but nothing is being recorded. -->
+  <div id="demo-banner" class="banner" hidden>
+    <strong>Demo mode.</strong> Firebase is not set up, so <strong>nothing is
+    being saved</strong> — the task still runs and you can see the tracking work.
+    To collect real data, fill in <code>config.js</code>
+    (<a href="docs/SETUP.md">setup instructions</a>).
+  </div>
+
   <!-- 1 ------------------------------------------------------------------ -->
   <section id="screen-welcome" class="screen visible">
     <h1 id="study-title">Study</h1>
@@ -100,8 +109,21 @@
   <!-- 8 ------------------------------------------------------------------ -->
   <section id="screen-done" class="screen">
     <h2>All done — thank you!</h2>
-    <p>Your responses have been saved.</p>
-    <p class="subtle">Session ID: <code id="done-session-id"></code></p>
+
+    <div id="done-results"></div>
+
+    <p id="done-saved-line">Your responses have been saved.<br>
+       <span class="subtle">Session ID: <code id="done-session-id"></code></span></p>
+
+    <div id="done-demo" hidden>
+      <p><strong>Nothing was saved</strong> — this is a demo, and no Firebase
+         project is connected.</p>
+      <button id="btn-download-demo" class="primary">Download my data as JSON</button>
+      <p class="subtle">The file matches what <code>analysis/fetch_data.py</code>
+         produces, so you can drop it into <code>data/raw/</code> and run
+         <code>python analysis/compute_metrics.py</code> on it right away.</p>
+    </div>
+
     <p id="done-redirect-note" class="subtle"></p>
   </section>
 

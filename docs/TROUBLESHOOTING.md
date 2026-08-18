@@ -25,10 +25,19 @@ red text. Two usual causes:
 You are on a `file://` address. Use the local server, or your GitHub Pages URL.
 `http://localhost` counts as secure; `http://192.168.x.x` does not.
 
-### "Firebase is not configured yet"
+### It says "Demo mode — nothing is being saved"
 
-`config.js` still has `PASTE_YOUR…` placeholders. See
-[SETUP.md step 2](SETUP.md#step-2--register-a-web-app-and-copy-the-config).
+Working as intended. `config.js` still has its `PASTE_YOUR…` placeholders, so
+there is nowhere to send data. The task runs normally and you can download your
+own session at the end; nothing is uploaded.
+
+To start collecting data, fill in `FIREBASE` in `config.js` —
+[SETUP.md step 2](SETUP.md#step-2--register-a-web-app-and-copy-the-config). The
+banner disappears once it is set.
+
+> If you are **recruiting participants** and you see this banner, stop. Their
+> data is not being recorded. Run `check.html` on your live URL before opening
+> a study.
 
 ### "Anonymous sign-in is turned off for this Firebase project"
 
