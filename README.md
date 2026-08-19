@@ -1,6 +1,6 @@
 # Markerless online experiments
 
-Welcome! This is a starting point for running hand and body movement experiments over the web.
+Welcome!:) This is a starting point for running hand and body movement experiments over the web.
 Participants open a link, their webcam is analyzed on their own computer, and
 only the numeric positions of their joints are sent back to you. No video is
 saved, and there is nothing for them to install. You can change this at any time. 
