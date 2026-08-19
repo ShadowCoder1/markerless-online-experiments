@@ -97,8 +97,12 @@ document your own ethics board approved, keeping the same filename.
 
 Then edit `CONSENT.affirmations` in `config.js` so the statements participants
 tick match the ones on your form, and edit `questions.js` so the demographic
-questions are the ones you want to ask. Both files are written to be edited and
-[docs/CUSTOMIZE.md](CUSTOMIZE.md) explains each setting.
+questions are the ones you want to ask.
+
+Open <http://localhost:8000/preview.html> to see your questions as participants
+will see them without running the task. It also warns about common mistakes and
+lists the column names your questions will produce.
+[docs/EDITING-QUESTIONS.md](EDITING-QUESTIONS.md) is the full guide.
 
 ## Step 5. Run it on yourself
 

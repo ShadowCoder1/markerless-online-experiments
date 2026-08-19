@@ -13,10 +13,32 @@ A finger-tapping experiment is included and works as-is. You can
 [try it here](https://shadowcoder1.github.io/markerless-online-experiments/).
 
 Participants see the consent form first, then a page of demographic questions,
-then the task. The consent form is a PDF you replace with your own. The
-questions live in `questions.js` and are meant to be edited: add one, delete
-one, or change the choices, and reload. See
-[docs/CUSTOMIZE.md](docs/CUSTOMIZE.md#the-questions-asked-before-the-task).
+then the task.
+
+## Changing the questions participants answer
+
+Edit **`questions.js`**. Each entry in the list is one question. To add one,
+copy an entry and change it. To remove one, delete the entry. To change the
+choices in a drop-down, edit its `options` list.
+
+```js
+{ id: "yearsMusicTraining",
+  label: "Years of musical training",
+  type: "number",
+  required: true,
+  min: 0,
+  max: 90 },
+```
+
+Then open **`preview.html`** to see your questions as participants will see
+them, without running the task. It also points out common mistakes and lists the
+column names your questions will produce in the results.
+
+Full guide: **[docs/EDITING-QUESTIONS.md](docs/EDITING-QUESTIONS.md)**.
+
+The consent form is `consent/consent-form.pdf`. Replace it with your own
+approved document, keeping the same filename, and edit `CONSENT.affirmations` in
+`config.js` so the statements match your form.
 
 Until you connect a Firebase project, the site runs in demo mode. The task works
 and you see your tap count as you go, but nothing is uploaded. You can download
@@ -27,6 +49,7 @@ your own session at the end and run the analysis scripts on it.
 ```
 index.html              the page participants see
 check.html              tests your setup and reports what is wrong
+preview.html            shows your demographic questions while you edit them
 config.js               study settings, Firebase keys, consent statements
 questions.js            the demographic questions, written to be edited
 consent/                the consent form participants read
@@ -95,7 +118,7 @@ Push your copy to GitHub, then go to Settings, Pages, and set the source to
 
 That address is what you give to Prolific. Prolific's identifiers are read from
 the URL automatically, so there is nothing to configure. See
-[docs/SETUP.md](docs/SETUP.md#step-6--going-live-with-prolific).
+[docs/SETUP.md](docs/SETUP.md#step-6-going-live-with-prolific).
 
 ## Writing your own experiment
 

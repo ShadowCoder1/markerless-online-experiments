@@ -17,86 +17,12 @@ rebuild. Save the file and reload the page.
 
 ## The questions asked before the task
 
-Open `questions.js`. It is a list, and each entry is one question. Add entries,
-delete entries, or move them around, then reload the page. Nothing else needs
-changing: the form builds itself, checks the required answers, and saves what
-people enter.
+Edit `questions.js`, then open `preview.html` to check your changes.
 
-### Adding a question
-
-Copy an entry and change it:
-
-```js
-{ id: "yearsPlayingPiano",
-  label: "Years of piano experience",
-  type: "number",
-  min: 0,
-  max: 90 },
-```
-
-Every question needs an `id` and a `label`. The `id` becomes the column name in
-your results, so keep it short and without spaces, and do not use the same one
-twice.
-
-### Adding or changing the choices
-
-The `options` list is what appears in the drop-down. Edit it as you would any
-list:
-
-```js
-{ id: "dominantHand",
-  label: "Dominant hand",
-  type: "select",
-  required: true,
-  options: ["Right", "Left", "Ambidextrous", "Prefer not to say"] },
-```
-
-### Deleting a question
-
-Delete the whole entry, from its opening `{` to its closing `},`. To remove the
-demographics page altogether:
-
-```js
-export const DEMOGRAPHIC_QUESTIONS = [];
-```
-
-### The kinds of question available
-
-| `type` | What the participant sees | Needs `options` |
-|---|---|---|
-| `"select"` | a drop-down | yes |
-| `"radio"` | all the choices at once, pick one | yes |
-| `"checkboxes"` | all the choices at once, pick any number | yes |
-| `"number"` | a box that only accepts numbers | no |
-| `"text"` | one line of text | no |
-| `"textarea"` | a larger box for a longer answer | no |
-
-### Settings you can add to any question
-
-| Setting | Effect |
-|---|---|
-| `required: true` | they cannot continue without answering, and a red asterisk is shown |
-| `help: "..."` | smaller grey text under the label |
-| `placeholder: "..."` | greyed-out example inside the box |
-| `min:` and `max:` | allowed range, for `"number"` questions |
-
-### One special id
-
-A question with the id `participantId` is also used as the participant's ID in
-your data. If they arrived from Prolific it is filled in for them already. If
-they leave it blank they are given a random anonymous ID. Delete the question if
-you would rather not ask.
-
-### Where the answers end up
-
-Answers are saved under `demographics` in each session, and
-`compute_metrics.py` turns them into columns named `demo_` followed by the
-question id. A question with `id: "age"` becomes the column `demo_age` in
-`trial_metrics.csv`. The prefix means a question can never collide with the name
-of a measurement.
-
-Questions left blank are left out rather than saved as an empty value, so an
-unanswered optional question shows up as a missing value in your table.
+This has its own guide, because it is the thing most people change first:
+**[EDITING-QUESTIONS.md](EDITING-QUESTIONS.md)**. It covers adding, removing and
+reordering questions, the six question types, the settings each one accepts, and
+what the answers are called in your results.
 
 ## The consent form
 

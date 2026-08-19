@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Question preview</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ctext y=%27.9em%27 font-size=%2790%27%3E%E2%9C%8B%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<main>
+  <h1>Question preview</h1>
+  <p class="subtle">
+    This page shows the questions from <code>questions.js</code> exactly as
+    participants will see them. Edit that file, reload this page, and check your
+    changes without going through the camera and the task. Participants never
+    see this page. Editing guide:
+    <a href="docs/EDITING-QUESTIONS.md">docs/EDITING-QUESTIONS.md</a>.
+  </p>
+
+  <div id="count" class="prose"></div>
+
+  <div id="demographics-form"></div>
+
+  <button id="btn-check" class="primary">Check answers</button>
+
+  <div id="result"></div>
+
+  <h2>Columns this will produce</h2>
+  <p class="subtle">These are the column names you will get in
+     <code>data/processed/trial_metrics.csv</code>.</p>
+  <div id="columns"></div>
+</main>
+
+<script type="module">
+import { DEMOGRAPHIC_QUESTIONS as QS } from "./questions.js";
+import { renderForm, readForm, focusField } from "./js/core/form.js";
+
+const form = document.getElementById("demographics-form");
+
+if (!QS.length) {
+  document.getElementById("count").innerHTML =
+    "<p><strong>There are no questions.</strong> Participants will go straight " +
+    "from the consent form to the task. Add entries to " +
+    "<code>DEMOGRAPHIC_QUESTIONS</code> in <code>questions.js</code> to change that.</p>";
+} else {
+  const required = QS.filter(q => q.required).length;
+  document.getElementById("count").innerHTML =
+    `<p><strong>${QS.length} question${QS.length === 1 ? "" : "s"}</strong>, ` +
+    `${required} of them required.</p>`;
+  renderForm(form, QS);
+}
+
+/* Warn about the mistakes that are easy to make by hand. */
+const problems = [];
+const seen = new Set();
+for (const q of QS) {
+  if (!q.id) problems.push("A question has no id.");
+  else if (seen.has(q.id)) problems.push(`Two questions share the id "${q.id}". Ids must be unique.`);
+  else seen.add(q.id);
+  if (!q.label) problems.push(`Question "${q.id}" has no label.`);
+  if (["select","radio","checkboxes"].includes(q.type) && !q.options?.length)
+    problems.push(`Question "${q.id}" is a ${q.type} but has no options list.`);
+  if (q.id && /\s/.test(q.id))
+    problems.push(`Id "${q.id}" contains a space. Use one word, like ${q.id.replace(/\s+/g,"")}.`);
+}
+if (problems.length) {
+  const box = document.createElement("div");
+  box.className = "banner";
+  box.innerHTML = "<strong>Problems found in questions.js</strong><ul>" +
+    problems.map(p => `<li>${p}</li>`).join("") + "</ul>";
+  document.querySelector("main").prepend(box);
+}
+
+document.getElementById("btn-check").addEventListener("click", () => {
+  const { ok, values, firstError } = readForm(form, QS);
+  const out = document.getElementById("result");
+  if (!ok) {
+    out.innerHTML = `<p class="bad">Some required questions are not answered.
+      A participant would not be able to continue.</p>`;
+    focusField(form, firstError);
+    return;
+  }
+  out.innerHTML = `<p class="good">All required questions answered. This is what
+    would be saved for this participant:</p>
+    <pre class="prose">${JSON.stringify(values, null, 2)
+      .replace(/[&<>]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;" }[c]))}</pre>`;
+});
+
+document.getElementById("columns").innerHTML = QS.length
+  ? `<pre class="prose">${QS.map(q => "demo_" + q.id).join("\n")}</pre>`
+  : "<p class='subtle'>None.</p>";
+</script>
+</body>
+</html>

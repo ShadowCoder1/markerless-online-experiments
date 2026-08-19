@@ -7,6 +7,11 @@
  *  the form builds itself, validates itself, and the answers are saved under
  *  `demographics` in each session.
  *
+ *  After editing, open preview.html to see your questions the way participants
+ *  will, and to have common mistakes pointed out.
+ *
+ *  Full guide with examples: docs/EDITING-QUESTIONS.md
+ *
  *  ---------------------------------------------------------------------------
  *  ADDING A QUESTION
  *  ---------------------------------------------------------------------------

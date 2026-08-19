@@ -264,3 +264,7 @@ table.results td { font-variant-numeric: tabular-nums; }
 .bad-field input, .bad-field select, .bad-field textarea, .bad-field .q-group {
   border-color: var(--bad);
 }
+
+/* ---- preview.html ------------------------------------------------------ */
+pre.prose { white-space: pre-wrap; word-break: break-word; font-size: .88rem; margin: 12px 0; }
+.banner ul { margin: 8px 0 0; padding-left: 20px; }

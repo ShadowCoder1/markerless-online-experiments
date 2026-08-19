@@ -32,7 +32,7 @@ there is nowhere to send data. The task runs normally and you can download your
 own session at the end; nothing is uploaded.
 
 To start collecting data, fill in `FIREBASE` in `config.js`. See
-[SETUP.md step 2](SETUP.md#step-2--register-a-web-app-and-copy-the-config). The
+[SETUP.md step 2](SETUP.md#step-2-register-a-web-app-and-copy-the-config). The
 banner disappears once it is set.
 
 > If you are **recruiting participants** and you see this banner, stop. Their
@@ -42,13 +42,13 @@ banner disappears once it is set.
 ### "Anonymous sign-in is turned off for this Firebase project"
 
 Firebase Console → **Build → Authentication → Sign-in method → Anonymous →
-Enable**. ([SETUP.md step 3](SETUP.md#step-3--turn-on-anonymous-sign-in))
+Enable**. ([SETUP.md step 3](SETUP.md#step-3-turn-on-anonymous-sign-in))
 
 ### "Firestore refused the write (permission denied)"
 
 Your rules have not been published. Paste all of `firestore.rules` into Firebase
 Console → **Build → Firestore Database → Rules** → **Publish**.
-([SETUP.md step 4](SETUP.md#step-4--create-the-database-and-publish-the-rules))
+([SETUP.md step 4](SETUP.md#step-4-create-the-database-and-publish-the-rules))
 
 If you have edited the rules yourself, note that a session document is rejected
 unless it has `uid`, `sessionId`, `experimentId`, and `startedAt`.
